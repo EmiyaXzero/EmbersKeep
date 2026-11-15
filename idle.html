@@ -111,29 +111,40 @@
   <div class="idle-modal" id="modal-bag">
     <div class="modal-head">
       <h3>🎒 12 部位暗黑纸娃娃 & 储物箱</h3>
-      <button class="modal-close" id="modal-bag-close">✕</button>
+      <div class="modal-head-tools">
+        <span style="font-size:11px; color:var(--text-dim);">按 [Esc] 返回战斗</span>
+        <button class="modal-close" id="modal-bag-close">✕</button>
+      </div>
     </div>
-    <div class="modal-body">
-      <!-- 12 部位纸娃娃 -->
-      <div style="font-size:11px; color:var(--text-dim); display:flex; justify-content:space-between;">
-        <span>穿戴装备 (点击一件装备可快速放入锻炉)：</span>
-      </div>
-      <div class="paper-doll-layout" id="paper-doll-slots">
-        <!-- 由 ui.js 动态渲染 12 个部位格 -->
-      </div>
-
-      <!-- 操作按钮栏 -->
-      <div style="display:flex; gap:8px;">
-        <button class="btn-dock primary" id="btn-auto-equip" style="flex:1;">⚡ 一键换装最高战力</button>
-        <button class="btn-dock" id="btn-decompose-all" style="flex:1;">♻️ 一键分解普通/精良</button>
+    <div class="modal-body modal-bag-layout">
+      <!-- 栏目 1：12 部位纸娃娃 -->
+      <div class="modal-col col-doll">
+        <div class="modal-col-title">
+          <span>穿戴装备 (点击一件装备放入锻炉)：</span>
+        </div>
+        <div class="paper-doll-layout" id="paper-doll-slots">
+          <!-- 由 ui.js 动态渲染 12 个部位格 -->
+        </div>
       </div>
 
-      <!-- 24 格背包储物箱 -->
-      <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">
-        <span>背包储物箱 (点击直接穿戴)：</span>
+      <!-- 栏目 2：操作按钮栏 -->
+      <div class="modal-col col-tools">
+        <div class="modal-col-title">快捷指令</div>
+        <button class="btn-dock primary" id="btn-auto-equip" style="width:100%;">⚡ 一键最高战力</button>
+        <button class="btn-dock" id="btn-decompose-all" style="width:100%;">♻️ 一键分解普通/精良</button>
+        <div style="font-size:10px; color:var(--text-dim); margin-top:4px; line-height:1.4;">
+          装备碎裂将化为虚空晶屑，可 100:1 兑换裂隙星石
+        </div>
       </div>
-      <div class="inventory-grid" id="inventory-cells">
-        <!-- 由 ui.js 动态渲染 24 格 -->
+
+      <!-- 栏目 3：24 格背包储物箱 -->
+      <div class="modal-col col-inv">
+        <div class="modal-col-title">
+          <span>背包储物箱 (点击直接穿戴)：</span>
+        </div>
+        <div class="inventory-grid" id="inventory-cells">
+          <!-- 由 ui.js 动态渲染 24 格 -->
+        </div>
       </div>
     </div>
   </div>
@@ -142,24 +153,40 @@
   <div class="idle-modal" id="modal-forge">
     <div class="modal-head">
       <h3>🔨 秘银锻炉 (+1 ~ +15 极限强化)</h3>
-      <button class="modal-close" id="modal-forge-close">✕</button>
+      <div class="modal-head-tools">
+        <span style="font-size:11px; color:var(--text-dim);">按 [Esc] 返回战斗</span>
+        <button class="modal-close" id="modal-forge-close">✕</button>
+      </div>
     </div>
-    <div class="modal-body">
-      <div class="forge-box">
+    <div class="modal-body modal-forge-layout">
+      <!-- 栏目 1：待强化装备 -->
+      <div class="modal-col col-forge-item">
+        <div class="modal-col-title">强化目标</div>
         <div class="forge-item-target" id="forge-target-info">
           <!-- 动态展示待强化装备属性 -->
         </div>
+        <div style="font-size:10px; color:var(--text-dim); margin-top:6px;">
+          可在纸娃娃背包中点击任意装备放入锻炉
+        </div>
+      </div>
 
-        <div class="forge-rate-row" id="forge-rate-info" style="display:grid; grid-template-columns:1fr 1fr; gap:6px; text-align:left;">
+      <!-- 栏目 2：概率与消耗 -->
+      <div class="modal-col col-forge-rate">
+        <div class="modal-col-title">概率与消耗评估</div>
+        <div class="forge-rate-row" id="forge-rate-info">
           <!-- 动态展示强化概率与材料消耗 -->
         </div>
+      </div>
 
+      <!-- 栏目 3：操作按钮 -->
+      <div class="modal-col col-forge-action">
+        <div class="modal-col-title">熔炉操作台</div>
         <button class="btn-forge-big" id="btn-execute-forge">
           🔥 催动秘银锻炉强化
         </button>
 
-        <button class="btn-dock" id="btn-exchange-shards" style="width:100%; margin-top:4px;">
-          💎 消耗 100 虚空晶屑 ➜ 兑换 1 颗裂隙星石
+        <button class="btn-dock" id="btn-exchange-shards" style="width:100%; margin-top:6px;">
+          💎 100 晶屑 ➜ 1 裂隙星石
         </button>
       </div>
     </div>

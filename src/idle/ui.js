@@ -104,6 +104,7 @@ export class IdleUI {
 
     if (btnBag && modalBag) {
       btnBag.onclick = () => {
+        if (modalForge) modalForge.classList.remove('is-open');
         modalBag.classList.toggle('is-open');
         if (modalBag.classList.contains('is-open')) this.renderInventoryModal();
       };
@@ -112,6 +113,7 @@ export class IdleUI {
 
     if (btnForge && modalForge) {
       btnForge.onclick = () => {
+        if (modalBag) modalBag.classList.remove('is-open');
         modalForge.classList.toggle('is-open');
         if (modalForge.classList.contains('is-open')) this.renderForgeModal();
       };

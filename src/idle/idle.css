@@ -284,15 +284,16 @@ body {
 }
 
 /* ================= 12 部位装备纸娃娃抽屉模态框 ================= */
+/* ================= 12 部位装备纸娃娃与锻炉模态框 ================= */
 .idle-modal {
   position: fixed;
   bottom: 165px;
   right: 15px;
-  width: 480px;
+  width: 490px;
   background: #14111a;
   border: 2px solid var(--border-gold);
   border-radius: 6px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.95);
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.95);
   display: none;
   flex-direction: column;
   z-index: 100;
@@ -300,46 +301,75 @@ body {
 }
 
 .idle-modal.is-open {
-  display: flex;
+  display: flex !important;
 }
 
 .modal-head {
-  padding: 10px 14px;
+  padding: 8px 14px;
   background: #1a1622;
   border-bottom: 1px solid var(--border-dim);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .modal-head h3 {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--gold-primary);
 }
 
+.modal-head-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .modal-close {
-  background: transparent;
-  border: none;
+  background: #231b2e;
+  border: 1px solid var(--border-dim);
   color: var(--text-dim);
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
+  border-radius: 3px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.modal-close:hover {
+  background: #ff4d4d;
+  color: #fff;
+  border-color: #ff4d4d;
 }
 
 .modal-body {
-  padding: 12px;
+  padding: 10px 12px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
-/* 12 部位纸娃娃网格 */
+.modal-col-title {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 12 部位纸娃娃网格 (常规模式 4 列 x 3 行) */
 .paper-doll-layout {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 6px;
   background: #0e0c13;
-  padding: 10px;
+  padding: 8px;
   border-radius: 4px;
   border: 1px solid var(--border-dim);
 }
@@ -348,7 +378,7 @@ body {
   background: #17141f;
   border: 1px solid var(--border-dim);
   border-radius: 4px;
-  height: 52px;
+  height: 50px;
   padding: 4px;
   display: flex;
   flex-direction: column;
@@ -375,15 +405,15 @@ body {
   text-overflow: ellipsis;
 }
 
-/* 24 格背包区 */
+/* 24 格背包区 (常规模式 6 列 x 4 行) */
 .inventory-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 6px;
-  max-height: 130px;
+  gap: 5px;
+  max-height: 140px;
   overflow-y: auto;
   background: #0e0c13;
-  padding: 8px;
+  padding: 6px;
   border-radius: 4px;
   border: 1px solid var(--border-dim);
 }
@@ -392,7 +422,7 @@ body {
   background: #17141f;
   border: 1px solid var(--border-dim);
   border-radius: 3px;
-  height: 40px;
+  height: 38px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -400,26 +430,25 @@ body {
   cursor: pointer;
   font-size: 10px;
   text-align: center;
+  transition: border-color 0.15s ease;
 }
 
 .inv-cell:hover {
   border-color: var(--gold-primary);
 }
 
-/* ================= 秘银锻炉模态框 ================= */
+/* 秘银锻炉常规卡片 */
 .forge-box {
   background: #0e0c13;
-  padding: 16px;
+  padding: 12px;
   border-radius: 4px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  text-align: center;
+  align-items: stretch;
+  gap: 10px;
 }
 
 .forge-item-target {
-  width: 100%;
   padding: 10px;
   background: #1a1624;
   border: 1px solid var(--border-gold);
@@ -427,16 +456,20 @@ body {
 }
 
 .forge-rate-row {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
   font-size: 12px;
+  background: #16121f;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border-dim);
 }
 
 .btn-forge-big {
   width: 100%;
-  padding: 12px;
-  font-size: 14px;
+  padding: 10px;
+  font-size: 13px;
   font-weight: bold;
   background: linear-gradient(180deg, #8a4515 0%, #4a2105 100%);
   border: 1px solid #fad65a;
@@ -444,10 +477,167 @@ body {
   border-radius: 4px;
   cursor: pointer;
   box-shadow: 0 0 15px rgba(250, 214, 90, 0.3);
+  transition: all 0.15s ease;
 }
 
 .btn-forge-big:hover {
   background: linear-gradient(180deg, #a65319 0%, #632b07 100%);
+  transform: translateY(-1px);
+}
+
+/* ================= 独立长条小窗与超矮窗口 (高度 <= 520px) 彻底自适应 ================= */
+body.is-popup .idle-modal,
+@media (max-height: 520px) {
+  .idle-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    border-top: 2px solid var(--border-gold) !important;
+    background: rgba(14, 11, 19, 0.98) !important;
+    backdrop-filter: blur(14px) !important;
+    z-index: 2000 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+
+  .idle-modal .modal-head {
+    padding: 4px 14px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+  }
+
+  .idle-modal .modal-body {
+    padding: 6px 14px !important;
+    height: calc(100vh - 32px) !important;
+    max-height: calc(100vh - 32px) !important;
+    overflow-y: hidden !important;
+    overflow-x: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 14px !important;
+    align-items: stretch !important;
+  }
+
+  /* 背包横向 3 栏并排布局 */
+  .modal-bag-layout {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 14px !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .modal-bag-layout .col-doll {
+    width: 430px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+  }
+
+  /* 纸娃娃在矮窗中变为 6 列 x 2 行 */
+  .modal-bag-layout .paper-doll-layout {
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 4px !important;
+    padding: 4px !important;
+  }
+
+  .modal-bag-layout .slot-box {
+    height: 42px !important;
+    padding: 2px 4px !important;
+  }
+
+  .modal-bag-layout .slot-label {
+    font-size: 9px !important;
+  }
+
+  .modal-bag-layout .slot-name {
+    font-size: 10px !important;
+  }
+
+  .modal-bag-layout .col-tools {
+    width: 155px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 6px !important;
+  }
+
+  .modal-bag-layout .col-tools .btn-dock {
+    padding: 8px 4px !important;
+    font-size: 11px !important;
+  }
+
+  .modal-bag-layout .col-inv {
+    flex: 1 !important;
+    min-width: 460px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+  }
+
+  /* 24 格背包在矮窗中变为 12 列 x 2 行 */
+  .modal-bag-layout .inventory-grid {
+    grid-template-columns: repeat(12, 1fr) !important;
+    gap: 4px !important;
+    padding: 4px !important;
+    max-height: none !important;
+    overflow-y: hidden !important;
+  }
+
+  .modal-bag-layout .inv-cell {
+    height: 42px !important;
+    min-width: 32px !important;
+    font-size: 10px !important;
+  }
+
+  /* 秘银锻炉横向 3 栏并排布局 */
+  .modal-forge-layout {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 16px !important;
+    width: 100% !important;
+    height: 100% !important;
+    align-items: stretch !important;
+  }
+
+  .modal-forge-layout .col-forge-item {
+    width: 310px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  .modal-forge-layout .col-forge-rate {
+    width: 360px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  .modal-forge-layout .col-forge-action {
+    width: 250px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+
+  .modal-forge-layout .btn-forge-big {
+    padding: 10px !important;
+    font-size: 13px !important;
+  }
 }
 
 /* ================= 老板键伪装终端 ================= */
