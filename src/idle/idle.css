@@ -102,10 +102,11 @@ body {
 .dock-stats-col {
   flex: 22;
   height: 100%;
-  padding: 10px 14px;
+  padding: 8px 14px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 8px;
   border-right: 1px solid var(--border-dim);
   background: linear-gradient(180deg, #16121f 0%, #100d16 100%);
 }
@@ -224,10 +225,11 @@ body {
 .dock-actions-col {
   flex: 23;
   height: 100%;
-  padding: 10px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 8px;
   background: #14101c;
 }
 
@@ -485,8 +487,155 @@ body {
   transform: translateY(-1px);
 }
 
-/* ================= 独立长条小窗与超矮窗口 (高度 <= 520px) 彻底自适应 ================= */
-body.is-popup .idle-modal,
+/* ================= 独立长条小窗 (body.is-popup) 模态框自适应 ================= */
+body.is-popup .idle-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  border: none !important;
+  border-top: 2px solid var(--border-gold) !important;
+  background: rgba(14, 11, 19, 0.98) !important;
+  backdrop-filter: blur(14px) !important;
+  z-index: 2000 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+body.is-popup .idle-modal .modal-head {
+  padding: 4px 14px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+}
+
+body.is-popup .idle-modal .modal-body {
+  padding: 6px 14px !important;
+  height: calc(100vh - 32px) !important;
+  max-height: calc(100vh - 32px) !important;
+  overflow-y: hidden !important;
+  overflow-x: auto !important;
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+}
+
+body.is-popup .modal-bag-layout {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 14px !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+body.is-popup .modal-bag-layout .col-doll {
+  width: 440px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+
+body.is-popup .modal-bag-layout .paper-doll-layout {
+  grid-template-columns: repeat(6, 1fr) !important;
+  gap: 4px !important;
+  padding: 4px !important;
+}
+
+body.is-popup .modal-bag-layout .slot-box {
+  height: 42px !important;
+  padding: 2px 4px !important;
+}
+
+body.is-popup .modal-bag-layout .slot-label {
+  font-size: 9px !important;
+}
+
+body.is-popup .modal-bag-layout .slot-name {
+  font-size: 10px !important;
+}
+
+body.is-popup .modal-bag-layout .col-tools {
+  width: 155px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 6px !important;
+}
+
+body.is-popup .modal-bag-layout .col-tools .btn-dock {
+  padding: 8px 4px !important;
+  font-size: 11px !important;
+}
+
+body.is-popup .modal-bag-layout .col-inv {
+  flex: 1 !important;
+  min-width: 460px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+
+body.is-popup .modal-bag-layout .inventory-grid {
+  grid-template-columns: repeat(12, 1fr) !important;
+  gap: 4px !important;
+  padding: 4px !important;
+  max-height: none !important;
+  overflow-y: hidden !important;
+}
+
+body.is-popup .modal-bag-layout .inv-cell {
+  height: 42px !important;
+  min-width: 32px !important;
+  font-size: 10px !important;
+}
+
+body.is-popup .modal-forge-layout {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 16px !important;
+  width: 100% !important;
+  height: 100% !important;
+  align-items: stretch !important;
+}
+
+body.is-popup .modal-forge-layout .col-forge-item {
+  width: 310px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+body.is-popup .modal-forge-layout .col-forge-rate {
+  width: 360px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+body.is-popup .modal-forge-layout .col-forge-action {
+  width: 250px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+body.is-popup .modal-forge-layout .btn-forge-big {
+  padding: 10px !important;
+  font-size: 13px !important;
+}
+
+/* ================= 超矮窗口 (高度 <= 520px) 响应式自适应 ================= */
 @media (max-height: 520px) {
   .idle-modal {
     position: fixed !important;
@@ -525,7 +674,6 @@ body.is-popup .idle-modal,
     align-items: stretch !important;
   }
 
-  /* 背包横向 3 栏并排布局 */
   .modal-bag-layout {
     display: flex !important;
     flex-direction: row !important;
@@ -535,14 +683,13 @@ body.is-popup .idle-modal,
   }
 
   .modal-bag-layout .col-doll {
-    width: 430px !important;
+    width: 440px !important;
     flex-shrink: 0 !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: flex-start !important;
   }
 
-  /* 纸娃娃在矮窗中变为 6 列 x 2 行 */
   .modal-bag-layout .paper-doll-layout {
     grid-template-columns: repeat(6, 1fr) !important;
     gap: 4px !important;
@@ -584,7 +731,6 @@ body.is-popup .idle-modal,
     justify-content: flex-start !important;
   }
 
-  /* 24 格背包在矮窗中变为 12 列 x 2 行 */
   .modal-bag-layout .inventory-grid {
     grid-template-columns: repeat(12, 1fr) !important;
     gap: 4px !important;
@@ -599,7 +745,6 @@ body.is-popup .idle-modal,
     font-size: 10px !important;
   }
 
-  /* 秘银锻炉横向 3 栏并排布局 */
   .modal-forge-layout {
     display: flex !important;
     flex-direction: row !important;
@@ -675,14 +820,28 @@ body.is-popup .idle-modal,
   line-height: 1.5;
 }
 
-/* 独立弹窗模式 body */
+/* 独立弹窗模式 body 与底栏约束 */
+body.is-popup {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: #0a080d;
+}
+
 body.is-popup .desktop-backdrop {
   display: none !important;
 }
 
 body.is-popup .idle-dock {
   height: 100vh;
-  min-height: 100vh;
-  max-height: 100vh;
+  min-height: 160px;
+  max-height: 220px;
   border-top: none;
+}
+
+@media (max-height: 320px) {
+  body.is-popup .idle-dock {
+    height: 100vh;
+    max-height: 100vh;
+  }
 }
