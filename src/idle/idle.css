@@ -1,0 +1,498 @@
+/* 《余烬裂隙》摸鱼挂机 ARPG 样式表 (idle.css) */
+
+:root {
+  --bg-deep: #0a080d;
+  --bg-card: #14111a;
+  --bg-hover: #1c1824;
+  --gold-primary: #fad65a;
+  --gold-glow: rgba(250, 214, 90, 0.35);
+  --border-dim: #2c2636;
+  --border-gold: #c59b3f;
+  --text-main: #e2dcee;
+  --text-dim: #8c8299;
+  --red-accent: #ff4d4d;
+  --blue-arcane: #55a4db;
+  --purple-epic: #a26cdb;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 常规全屏模式：上方展示余烬城堡氛围壁纸，下方吸附摸鱼底栏 */
+.desktop-backdrop {
+  flex: 1;
+  background: radial-gradient(circle at 50% 70%, #1c1524 0%, #0a080d 80%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-bottom: 2px solid var(--border-dim);
+}
+
+.backdrop-brand {
+  text-align: center;
+  z-index: 2;
+}
+
+.backdrop-brand h1 {
+  font-size: 32px;
+  color: var(--gold-primary);
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px var(--gold-glow);
+}
+
+.backdrop-brand p {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.backdrop-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+  z-index: 2;
+}
+
+/* 核心底栏摸鱼容器 (固定高度 160px) */
+.idle-dock {
+  height: 160px;
+  min-height: 160px;
+  max-height: 160px;
+  background: #110e17;
+  display: flex;
+  border-top: 2px solid var(--border-gold);
+  box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.85);
+  position: relative;
+  z-index: 10;
+}
+
+/* 左侧 55% 宽度：横版长廊 Canvas 视口 */
+.dock-viewport-col {
+  flex: 55;
+  height: 100%;
+  position: relative;
+  background: #000;
+  border-right: 1px solid var(--border-dim);
+  overflow: hidden;
+}
+
+#dock-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 中间 22% 宽度：角色数值与裂隙雷达 */
+.dock-stats-col {
+  flex: 22;
+  height: 100%;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid var(--border-dim);
+  background: linear-gradient(180deg, #16121f 0%, #100d16 100%);
+}
+
+.hero-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-avatar {
+  width: 36px;
+  height: 36px;
+  background: #231b2e;
+  border: 1px solid var(--border-gold);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.hero-info {
+  flex: 1;
+}
+
+.hero-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.hero-name {
+  font-size: 13px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.hero-level {
+  font-size: 11px;
+  color: var(--gold-primary);
+}
+
+.combat-power {
+  font-size: 12px;
+  color: var(--blue-arcane);
+  margin-top: 2px;
+}
+
+.bar-wrap {
+  margin-top: 4px;
+  height: 6px;
+  background: #1e1b24;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar-fill-hp {
+  height: 100%;
+  background: linear-gradient(90deg, #d32f2f, #ff5252);
+  width: 100%;
+  transition: width 0.2s ease;
+}
+
+/* 裂隙星石收集仪表 */
+.rift-sigil-meter {
+  background: #1a1524;
+  border: 1px solid var(--border-dim);
+  border-radius: 4px;
+  padding: 6px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sigil-label {
+  font-size: 11px;
+  color: #c5bfd2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sigil-count {
+  font-size: 12px;
+  font-weight: bold;
+  color: #fad65a;
+}
+
+.sigil-count.is-ready {
+  color: #ff3b8b;
+  text-shadow: 0 0 8px rgba(255, 59, 139, 0.6);
+  animation: pulse-glow 1.2s infinite alternate;
+}
+
+@keyframes pulse-glow {
+  from { opacity: 0.8; }
+  to { opacity: 1.0; transform: scale(1.04); }
+}
+
+/* 钱包迷你胶囊 */
+.wallet-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.wallet-pill {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* 右侧 23% 宽度：摸鱼操作抽屉按钮群 */
+.dock-actions-col {
+  flex: 23;
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #14101c;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.btn-dock {
+  background: #20192b;
+  border: 1px solid var(--border-dim);
+  color: #c5bfd2;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 8px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-dock:hover {
+  background: #2d243d;
+  color: #fff;
+  border-color: var(--border-gold);
+}
+
+.btn-dock.primary {
+  background: #4a2810;
+  border-color: #f28929;
+  color: #fad65a;
+  font-weight: bold;
+}
+
+.btn-dock.primary:hover {
+  background: #633615;
+}
+
+.dock-foot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.stealth-hint {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ================= 12 部位装备纸娃娃抽屉模态框 ================= */
+.idle-modal {
+  position: fixed;
+  bottom: 165px;
+  right: 15px;
+  width: 480px;
+  background: #14111a;
+  border: 2px solid var(--border-gold);
+  border-radius: 6px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.95);
+  display: none;
+  flex-direction: column;
+  z-index: 100;
+  max-height: calc(100vh - 180px);
+}
+
+.idle-modal.is-open {
+  display: flex;
+}
+
+.modal-head {
+  padding: 10px 14px;
+  background: #1a1622;
+  border-bottom: 1px solid var(--border-dim);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-head h3 {
+  font-size: 14px;
+  color: var(--gold-primary);
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.modal-body {
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 12 部位纸娃娃网格 */
+.paper-doll-layout {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  background: #0e0c13;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border-dim);
+}
+
+.slot-box {
+  background: #17141f;
+  border: 1px solid var(--border-dim);
+  border-radius: 4px;
+  height: 52px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.slot-box:hover, .slot-box.is-selected {
+  border-color: var(--gold-primary);
+  background: #231d30;
+}
+
+.slot-label {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.slot-name {
+  font-size: 11px;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 24 格背包区 */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  max-height: 130px;
+  overflow-y: auto;
+  background: #0e0c13;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-dim);
+}
+
+.inv-cell {
+  background: #17141f;
+  border: 1px solid var(--border-dim);
+  border-radius: 3px;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 10px;
+  text-align: center;
+}
+
+.inv-cell:hover {
+  border-color: var(--gold-primary);
+}
+
+/* ================= 秘银锻炉模态框 ================= */
+.forge-box {
+  background: #0e0c13;
+  padding: 16px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.forge-item-target {
+  width: 100%;
+  padding: 10px;
+  background: #1a1624;
+  border: 1px solid var(--border-gold);
+  border-radius: 4px;
+}
+
+.forge-rate-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.btn-forge-big {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  background: linear-gradient(180deg, #8a4515 0%, #4a2105 100%);
+  border: 1px solid #fad65a;
+  color: #fad65a;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(250, 214, 90, 0.3);
+}
+
+.btn-forge-big:hover {
+  background: linear-gradient(180deg, #a65319 0%, #632b07 100%);
+}
+
+/* ================= 老板键伪装终端 ================= */
+.stealth-terminal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #1e1e1e;
+  color: #4af626;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.stealth-terminal.is-hidden {
+  display: none;
+}
+
+.terminal-header {
+  padding: 4px 10px;
+  background: #2d2d2d;
+  color: #ccc;
+  display: flex;
+  justify-content: space-between;
+}
+
+.terminal-logs {
+  flex: 1;
+  padding: 8px 12px;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+
+/* 独立弹窗模式 body */
+body.is-popup .desktop-backdrop {
+  display: none !important;
+}
+
+body.is-popup .idle-dock {
+  height: 100vh;
+  min-height: 100vh;
+  max-height: 100vh;
+  border-top: none;
+}

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>余烬裂隙 - 桌面摸鱼挂机 ARPG | EmbersRift</title>
+  <link rel="stylesheet" href="./src/idle/idle.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗡️</text></svg>">
+</head>
+<body>
+
+  <!-- 常规桌面背景展示区 (独立摸鱼长条小窗时通过 body.is-popup 隐藏) -->
+  <div class="desktop-backdrop">
+    <div class="backdrop-brand">
+      <h1>余烬裂隙 · EMBERS RIFT</h1>
+      <p>暗黑复古像素 · 桌面底部长条摸鱼挂机 ARPG · 12部位暗黑纸娃娃 · 秘银锻造+15 · 史诗金光柱</p>
+      
+      <div class="backdrop-actions">
+        <button class="btn-dock primary" id="btn-hero-popout" style="padding:10px 18px; font-size:13px;">
+          🪟 弹出独立底部摸鱼条 (最爽上班挂机)
+        </button>
+        <a href="./pixelforge/index.html" class="btn-dock" style="text-decoration:none; padding:10px 14px;">
+          🎨 像素工坊 PixelForge
+        </a>
+        <a href="./index.html" class="btn-dock" style="text-decoration:none; padding:10px 14px;">
+          🏰 塔防守护 EmbersKeep
+        </a>
+      </div>
+
+      <div style="margin-top:24px; color:var(--text-dim); font-size:12px; line-height:1.8;">
+        <div>⚡ <b>核心玩法：</b>英雄自动行进索敌，自动斩杀小怪掉落金币与材料</div>
+        <div>🌀 <b>裂隙召唤：</b>集齐 20 颗裂隙星石自动召唤远古裂隙方尖碑，击破后唤醒裂隙霸主 Boss</div>
+        <div>✨ <b>太古史诗：</b>击杀 Boss 必触发冲天金色史诗光柱，爆出顶级太古神装！</div>
+        <div>🕶️ <b>摸鱼神技：</b>随时按键盘 <code>Esc</code> 或 <code>~</code> 瞬间伪装为黑底绿字后台编译终端</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 核心底栏摸鱼容器 (固定高度 160px，吸附屏幕最底部) -->
+  <div class="idle-dock">
+
+    <!-- 1. 左侧横版长廊 Canvas 视口 (55% 宽度) -->
+    <div class="dock-viewport-col">
+      <canvas id="dock-canvas"></canvas>
+    </div>
+
+    <!-- 2. 中间角色数值与裂隙雷达 (22% 宽度) -->
+    <div class="dock-stats-col">
+      <div class="hero-profile">
+        <div class="hero-avatar">🗡️</div>
+        <div class="hero-info">
+          <div class="hero-name-row">
+            <span class="hero-name" id="hud-hero-name">余烬行者</span>
+            <span class="hero-level" id="hud-hero-level">Lv.1</span>
+          </div>
+          <div class="combat-power" id="hud-hero-cp">⚡ 战力 170</div>
+          <div class="bar-wrap" title="生命值">
+            <div class="bar-fill-hp" id="hud-hp-fill" style="width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 裂隙方尖碑星石雷达 -->
+      <div class="rift-sigil-meter">
+        <div class="sigil-label">
+          <span>🌀 裂隙星石</span>
+        </div>
+        <span class="sigil-count" id="hud-sigil-count">0 / 20</span>
+      </div>
+
+      <!-- 资产胶囊 -->
+      <div class="wallet-row">
+        <div class="wallet-pill" title="金币">🪙 <span id="hud-wallet-gold">0</span></div>
+        <div class="wallet-pill" title="余烬玄碳">🔥 <span id="hud-wallet-cinders">0</span></div>
+        <div class="wallet-pill" title="虚空晶屑">💎 <span id="hud-wallet-shards">0</span></div>
+      </div>
+    </div>
+
+    <!-- 3. 右侧摸鱼操作群 (23% 宽度) -->
+    <div class="dock-actions-col">
+      <div class="action-grid">
+        <button class="btn-dock primary" id="btn-open-bag">🎒 纸娃娃</button>
+        <button class="btn-dock primary" id="btn-open-forge">🔨 锻炉</button>
+        <button class="btn-dock" id="btn-bosskey">🕶️ 老板键</button>
+        <button class="btn-dock" id="btn-popout">🪟 小窗</button>
+      </div>
+
+      <div class="dock-foot-row">
+        <span class="stealth-hint" id="dock-stealth-hint" title="点击或按 Esc 隐藏">快捷键 [Esc] 终端伪装</span>
+        <span style="color:#55a4db;">v1.0.0</span>
+      </div>
+    </div>
+
+    <!-- 老板键伪装终端层 (全屏覆盖底栏) -->
+    <div class="stealth-terminal is-hidden" id="stealth-terminal">
+      <div class="terminal-header">
+        <span>daemon :: worker-task-pool-idle [pid: 84920] - node src/daemon.js</span>
+        <button class="modal-close" id="stealth-exit" style="color:#aaa;">✕</button>
+      </div>
+      <div class="terminal-logs" id="terminal-logs">
+        [system] Service initialized successfully at port 8080.<br>
+        [worker-0] Thread pool standby. Awaiting event loop dispatch.<br>
+        [net] Keepalive ping OK (latency: 1.2ms).<br>
+        [mem] Heap usage: 48.2MB / 128MB. Garbage collector idle.<br>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= 12 部位装备纸娃娃与背包模态框 ================= -->
+  <div class="idle-modal" id="modal-bag">
+    <div class="modal-head">
+      <h3>🎒 12 部位暗黑纸娃娃 & 储物箱</h3>
+      <button class="modal-close" id="modal-bag-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- 12 部位纸娃娃 -->
+      <div style="font-size:11px; color:var(--text-dim); display:flex; justify-content:space-between;">
+        <span>穿戴装备 (点击一件装备可快速放入锻炉)：</span>
+      </div>
+      <div class="paper-doll-layout" id="paper-doll-slots">
+        <!-- 由 ui.js 动态渲染 12 个部位格 -->
+      </div>
+
+      <!-- 操作按钮栏 -->
+      <div style="display:flex; gap:8px;">
+        <button class="btn-dock primary" id="btn-auto-equip" style="flex:1;">⚡ 一键换装最高战力</button>
+        <button class="btn-dock" id="btn-decompose-all" style="flex:1;">♻️ 一键分解普通/精良</button>
+      </div>
+
+      <!-- 24 格背包储物箱 -->
+      <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">
+        <span>背包储物箱 (点击直接穿戴)：</span>
+      </div>
+      <div class="inventory-grid" id="inventory-cells">
+        <!-- 由 ui.js 动态渲染 24 格 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 秘银锻炉模态框 ================= -->
+  <div class="idle-modal" id="modal-forge">
+    <div class="modal-head">
+      <h3>🔨 秘银锻炉 (+1 ~ +15 极限强化)</h3>
+      <button class="modal-close" id="modal-forge-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="forge-box">
+        <div class="forge-item-target" id="forge-target-info">
+          <!-- 动态展示待强化装备属性 -->
+        </div>
+
+        <div class="forge-rate-row" id="forge-rate-info" style="display:grid; grid-template-columns:1fr 1fr; gap:6px; text-align:left;">
+          <!-- 动态展示强化概率与材料消耗 -->
+        </div>
+
+        <button class="btn-forge-big" id="btn-execute-forge">
+          🔥 催动秘银锻炉强化
+        </button>
+
+        <button class="btn-dock" id="btn-exchange-shards" style="width:100%; margin-top:4px;">
+          💎 消耗 100 虚空晶屑 ➜ 兑换 1 颗裂隙星石
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模块加载启动 -->
+  <script type="module">
+    import { IdleUI } from './src/idle/ui.js';
+    import { BossKeyManager } from './src/idle/bosskey.js';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      window.idleApp = new IdleUI();
+
+      const btnHeroPop = document.getElementById('btn-hero-popout');
+      if (btnHeroPop) {
+        btnHeroPop.onclick = () => BossKeyManager.openPopoutWindow();
+      }
+
+      const dockStealthHint = document.getElementById('dock-stealth-hint');
+      if (dockStealthHint && window.idleApp.bossKey) {
+        dockStealthHint.onclick = () => window.idleApp.bossKey.toggleStealth();
+      }
+    });
+  </script>
+</body>
+</html>
