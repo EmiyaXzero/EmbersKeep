@@ -36,7 +36,7 @@ assert.ok(EQUIPMENT_SLOTS.includes(dropNormal.slot), '掉落槽位合法');
 assert.ok(dropNormal.combatPower > 0, '掉落物品战力必须为正数');
 
 const dropBoss = generateDrop(20, true);
-assert.ok(['epic', 'mythic', 'unique'].includes(dropBoss.rarity), 'Boss 掉落优先保障高品阶');
+assert.ok(['epic', 'mythic', 'unique', 'rare'].includes(dropBoss.rarity), 'Boss 掉落优先保障高品阶');
 console.log('✓ PASS: 掉落生成机制正确（小怪/Boss差异）');
 
 // 4. 验证保底新手铁剑

@@ -10,73 +10,50 @@ import { createFallbackWeapon } from './equipment.js';
 /**
  * 强化阶梯成功率与风险判定规则
  */
+/**
+ * 强化阶梯成功率与风险判定规则
+ * -------------------------------------------------------------
+ * +1 ~ +3: 100% 绝对安全入门
+ * +4 ~ +8: 85% ~ 40% 阶梯递减，失败安全（不掉级）
+ * +9 ~ +10: 30% ~ 20% 风险区间，失败跌落 1 级
+ * +11 ~ +15: 15% ~ 3% 极限高危，失败碎裂为虚空晶屑
+ */
 export function getForgeRate(currentLevel = 0) {
   const lvl = Math.max(0, currentLevel);
 
-  // +1 ~ +7: 100% 绝对安全
-  if (lvl < 7) {
-    return {
-      targetLevel: lvl + 1,
-      successRate: 1.0,
-      costGold: (lvl + 1) * 300,
-      costCinders: lvl >= 4 ? (lvl - 3) * 2 : 0,
-      riskType: 'safe',
-      glowColor: '#ffffff'
-    };
-  }
-
-  // +8: 80% 成功，失败安全不掉级
-  if (lvl === 7) {
-    return {
-      targetLevel: 8,
-      successRate: 0.8,
-      costGold: 3500,
-      costCinders: 5,
-      riskType: 'safe',
-      glowColor: '#55a4db'
-    };
-  }
-
-  // +9 ~ +10: 掉级区间
-  if (lvl === 8) {
-    return {
-      targetLevel: 9,
-      successRate: 0.6,
-      costGold: 7000,
-      costCinders: 10,
-      riskType: 'degrade',
-      glowColor: '#a26cdb'
-    };
-  }
-  if (lvl === 9) {
-    return {
-      targetLevel: 10,
-      successRate: 0.45,
-      costGold: 15000,
-      costCinders: 18,
-      riskType: 'degrade',
-      glowColor: '#e55ea8'
-    };
-  }
-
-  // +11 ~ +15: 碎刀碎甲高危区间
-  const shatterRates = {
-    10: { rate: 0.30, gold: 30000, cinders: 30, glow: '#fad65a' },
-    11: { rate: 0.20, gold: 60000, cinders: 50, glow: '#ff9800' },
-    12: { rate: 0.14, gold: 120000, cinders: 80, glow: '#f44336' },
-    13: { rate: 0.08, gold: 240000, cinders: 140, glow: '#ff3b8b' },
-    14: { rate: 0.04, gold: 500000, cinders: 240, glow: '#e040fb' }
+  const ratesTable = {
+    0:  { rate: 1.00, gold: 500,     cinders: 0,   risk: 'safe',    glow: '#ffffff' },
+    1:  { rate: 1.00, gold: 1000,    cinders: 0,   risk: 'safe',    glow: '#ffffff' },
+    2:  { rate: 1.00, gold: 1800,    cinders: 0,   risk: 'safe',    glow: '#ffffff' },
+    3:  { rate: 0.85, gold: 3000,    cinders: 2,   risk: 'safe',    glow: '#ffffff' },
+    4:  { rate: 0.70, gold: 5000,    cinders: 4,   risk: 'safe',    glow: '#55a4db' },
+    5:  { rate: 0.60, gold: 8000,    cinders: 6,   risk: 'safe',    glow: '#55a4db' },
+    6:  { rate: 0.50, gold: 12000,   cinders: 8,   risk: 'safe',    glow: '#55a4db' },
+    7:  { rate: 0.40, gold: 18000,   cinders: 12,  risk: 'safe',    glow: '#a26cdb' },
+    8:  { rate: 0.30, gold: 28000,   cinders: 18,  risk: 'degrade', glow: '#a26cdb' },
+    9:  { rate: 0.20, gold: 45000,   cinders: 25,  risk: 'degrade', glow: '#e55ea8' },
+    10: { rate: 0.15, gold: 80000,   cinders: 35,  risk: 'shatter', glow: '#fad65a' },
+    11: { rate: 0.12, gold: 150000,  cinders: 50,  risk: 'shatter', glow: '#ff9800' },
+    12: { rate: 0.09, gold: 300000,  cinders: 80,  risk: 'shatter', glow: '#f44336' },
+    13: { rate: 0.06, gold: 600000,  cinders: 120, risk: 'shatter', glow: '#ff3b8b' },
+    14: { rate: 0.03, gold: 1200000, cinders: 200, risk: 'shatter', glow: '#e040fb' }
   };
 
-  const highTier = shatterRates[lvl] || { rate: 0.02, gold: 1000000, cinders: 500, glow: '#00e5ff' };
+  const tier = ratesTable[lvl] || {
+    rate: 0.01,
+    gold: 2000000,
+    cinders: 300,
+    risk: 'shatter',
+    glow: '#00e5ff'
+  };
 
   return {
     targetLevel: lvl + 1,
-    successRate: highTier.rate,
-    costGold: highTier.gold,
-    costCinders: highTier.cinders,
-    riskType: 'shatter',
-    glowColor: highTier.glow
+    successRate: tier.rate,
+    costGold: tier.gold,
+    costCinders: tier.cinders,
+    riskType: tier.risk,
+    glowColor: tier.glow
   };
 }
 

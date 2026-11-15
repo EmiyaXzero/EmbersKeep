@@ -32,14 +32,23 @@ const testItem = {
   stats: { attack: 300 }
 };
 
-const wallet = { gold: 100000, cinders: 500, shards: 0 };
+const wallet = { gold: 1000000, cinders: 5000, shards: 0 };
 const resultSuccess = executeForge(testItem, wallet, 0.01); // 强制 roll 0.01 命中成功
 assert.equal(resultSuccess.success, true, '强制低 roll 判定成功');
 assert.equal(resultSuccess.item.reinforceLevel, 1, '强化等级提升到 1');
-assert.ok(wallet.gold < 100000, '扣除金币');
+assert.ok(wallet.gold < 1000000, '扣除金币');
 console.log('✓ PASS: 强化成功判定与等级提升正确');
 
-// 3. 验证 +8 失败降级
+// 3. 验证 +3 失败安全不掉级
+const itemLevel3 = { ...testItem, reinforceLevel: 3 };
+const resultSafeFail = executeForge(itemLevel3, wallet, 0.99); // 强制高 roll 判定失败
+assert.equal(resultSafeFail.success, false);
+assert.equal(resultSafeFail.degraded, false, '安全区间不掉级');
+assert.equal(resultSafeFail.shattered, false, '安全区间不碎裂');
+assert.equal(resultSafeFail.item.reinforceLevel, 3, '等级依然保持 +3');
+console.log('✓ PASS: +3 失败安全保持原等级');
+
+// 4. 验证 +8 失败降级
 const itemLevel8 = { ...testItem, reinforceLevel: 8 };
 const resultDegrade = executeForge(itemLevel8, wallet, 0.99); // 强制高 roll 判定失败
 assert.equal(resultDegrade.success, false);
