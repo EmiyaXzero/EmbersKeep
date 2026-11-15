@@ -21,6 +21,12 @@ export class IdleViewport {
     this.epicBeam = null; // 当前史诗金光特效
     this.slashAnim = 0; // 剑气挥砍动画计数器
 
+    // 打击顿挫、屏幕震颤与神技动效队列
+    this.shakeDuration = 0;
+    this.shakeIntensity = 0;
+    this.hitStopTimer = 0;
+    this.activeSkills = [];
+
     // 预加载怪物贴图
     this.images = {
       ashen_wolf: new Image(),
@@ -40,8 +46,31 @@ export class IdleViewport {
     this.ctx.imageSmoothingEnabled = false;
   }
 
+  triggerShake(intensity = 3, duration = 150) {
+    this.shakeIntensity = Math.max(this.shakeIntensity, intensity);
+    this.shakeDuration = Math.max(this.shakeDuration, duration);
+  }
+
+  triggerHitStop(ms = 40) {
+    this.hitStopTimer = Math.max(this.hitStopTimer, ms);
+  }
+
+  addSkillEffect(skillKey, evt) {
+    const durationMap = { Q: 420, W: 600, E: 850 };
+    this.activeSkills.push({
+      key: skillKey,
+      age: 0,
+      duration: durationMap[skillKey] || 500,
+      heroX: evt.heroX || 100,
+      heroY: evt.heroY || (this.height - 30),
+      isCrit: evt.isCrit,
+      shake: evt.shake || 3,
+      hitCount: evt.hitCount || 1
+    });
+  }
+
   /**
-   * 消费并执行事件 (音效与粒子生成)
+   * 消费并执行事件 (音效、震屏、顿挫与粒子生成)
    */
   processEvents(events = []) {
     events.forEach(evt => {
@@ -56,9 +85,44 @@ export class IdleViewport {
             alpha: 1.0,
             vy: -1.2
           });
-          if (evt.isCrit) sfx.playHit();
-          else sfx.playSlash();
+          if (evt.isCrit) {
+            this.triggerShake(2.5, 120);
+            this.triggerHitStop(35);
+            sfx.playHit();
+          } else {
+            sfx.playSlash();
+          }
           break;
+
+        case 'SKILL_CAST':
+          this.triggerShake(evt.shake || 4, 240);
+          this.triggerHitStop(45);
+          this.addSkillEffect(evt.skillKey, evt);
+          if (evt.skillKey === 'Q') sfx.playSkillQ();
+          else if (evt.skillKey === 'W') sfx.playSkillW();
+          else if (evt.skillKey === 'E') sfx.playSkillE();
+          break;
+
+        case 'DROP_PICKUP': {
+          sfx.playDropPickup(evt.rarity);
+          let dropColor = '#fad65a';
+          if (evt.rarity === 'rare') dropColor = '#55a4db';
+          else if (evt.rarity === 'mythic') dropColor = '#ff5533';
+          else if (evt.rarity === 'unique') dropColor = '#ff2a6d';
+          else if (evt.rarity === 'common') dropColor = '#e8d898';
+
+          this.spawnBurstParticles(evt.x, evt.y - 10, dropColor, 8);
+          this.floatingTexts.push({
+            x: evt.x + (Math.random() - 0.5) * 24,
+            y: evt.y - 18,
+            text: evt.label || '+1',
+            color: dropColor,
+            size: evt.rarity === 'epic' || evt.rarity === 'mythic' ? 13 : 11,
+            alpha: 1.0,
+            vy: -1.0
+          });
+          break;
+        }
 
         case 'OBELISK_HIT':
           this.floatingTexts.push({
@@ -133,9 +197,26 @@ export class IdleViewport {
     const w = this.width;
     const h = this.height;
 
+    // 1. 顿挫打击微冻帧衰减
+    if (this.hitStopTimer > 0) {
+      this.hitStopTimer = Math.max(0, this.hitStopTimer - 16.6);
+    }
+
+    // 2. 屏幕震颤偏移
+    let shakeX = 0;
+    let shakeY = 0;
+    if (this.shakeDuration > 0) {
+      this.shakeDuration = Math.max(0, this.shakeDuration - 16.6);
+      shakeX = (Math.random() - 0.5) * this.shakeIntensity * 2;
+      shakeY = (Math.random() - 0.5) * this.shakeIntensity * 2;
+    }
+
+    ctx.save();
+    ctx.translate(shakeX, shakeY);
+
     // 1. 清屏与深暗地牢底色
     ctx.fillStyle = '#100d16';
-    ctx.fillRect(0, 0, w, h);
+    ctx.fillRect(-10, -10, w + 20, h + 20);
 
     // 2. 多层视差暗黑长廊背景
     this.renderParallaxBackground(snapshot.distanceWalked);
@@ -148,21 +229,29 @@ export class IdleViewport {
     // 4. 绘制怪物与 Boss
     this.renderMonsters(snapshot.monsters, snapshot.activeBoss);
 
-    // 5. 绘制主角流浪剑士与武器强化光环
+    // 5. 绘制地面物理喷装与自动磁吸掉落物
+    if (snapshot.groundDrops && snapshot.groundDrops.length > 0) {
+      this.renderGroundDrops(snapshot.groundDrops);
+    }
+
+    // 6. 绘制主角流浪剑士与武器强化光环
     this.renderHero(snapshot.hero, snapshot.equippedMap.weapon);
 
-    // 6. 绘制通天史诗金光柱特效
+    // 7. 绘制三大招牌主动神技视觉动效 (Q/W/E)
+    this.renderSkillEffects(snapshot.hero);
+
+    // 8. 绘制通天史诗金光柱特效
     if (this.epicBeam) {
       this.renderEpicBeam();
     }
 
-    // 7. 绘制粒子
+    // 9. 绘制粒子
     this.renderParticles();
 
-    // 8. 绘制浮动伤害数字
+    // 10. 绘制浮动伤害与拾取提示
     this.renderFloatingTexts();
 
-    // 9. 顶部 HUD 轻量状态指示 (Boss 限时倒计时等)
+    // 11. 顶部 HUD 轻量状态指示 (Boss 限时倒计时等)
     if (snapshot.state === 'BOSS_ENCOUNTER') {
       const remainingSec = Math.max(0, Math.ceil(snapshot.bossTimer / 1000));
       ctx.fillStyle = 'rgba(255, 59, 74, 0.85)';
@@ -170,6 +259,223 @@ export class IdleViewport {
       ctx.textAlign = 'center';
       ctx.fillText(`⚡ 裂隙霸主激战中！限时逃逸: ${remainingSec}s`, w * 0.5, 22);
     }
+
+    ctx.restore();
+  }
+
+  /**
+   * 绘制地面掉落物：物理抛物线、彩色微光柱、悬浮文字标牌与磁吸拖尾
+   */
+  renderGroundDrops(groundDrops) {
+    const ctx = this.ctx;
+    const rarityColors = {
+      common: '#c5bfd2',
+      uncommon: '#4bb352',
+      rare: '#55a4db',
+      epic: '#fad65a',
+      mythic: '#ff5533',
+      unique: '#ff2a6d'
+    };
+
+    for (const drop of groundDrops) {
+      const color = rarityColors[drop.rarity] || '#c5bfd2';
+      const isHighTier = ['epic', 'mythic', 'unique'].includes(drop.rarity);
+
+      ctx.save();
+
+      // 1. 彩色垂直微光柱 (从地面直插廊顶)
+      const beamHeight = isHighTier ? drop.y : 45;
+      const beamW = isHighTier ? 16 + Math.sin(Date.now() * 0.015) * 4 : 8;
+      const beamGrad = ctx.createLinearGradient(drop.x - beamW * 0.5, 0, drop.x + beamW * 0.5, 0);
+      beamGrad.addColorStop(0, 'rgba(0,0,0,0)');
+      beamGrad.addColorStop(0.5, drop.isMagnet ? 'rgba(255,255,255,0.4)' : `${color}aa`);
+      beamGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+      ctx.fillStyle = beamGrad;
+      ctx.fillRect(drop.x - beamW * 0.5, drop.y - beamHeight, beamW, beamHeight);
+
+      // 2. 磁吸模式下绘制向主角牵引的流光拖尾粒子线
+      if (drop.isMagnet) {
+        ctx.strokeStyle = `${color}88`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(drop.x, drop.y);
+        ctx.lineTo(drop.x - (drop.vx || 0) * 0.04, drop.y - (drop.vy || 0) * 0.04);
+        ctx.stroke();
+      }
+
+      // 3. 地面实体核心
+      ctx.fillStyle = color;
+      if (drop.type === 'gold') {
+        ctx.beginPath();
+        ctx.arc(drop.x, drop.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(drop.x - 1, drop.y - 1, 2, 2);
+      } else if (drop.type === 'sigil') {
+        ctx.beginPath();
+        ctx.moveTo(drop.x, drop.y - 4);
+        ctx.lineTo(drop.x + 4, drop.y);
+        ctx.lineTo(drop.x, drop.y + 4);
+        ctx.lineTo(drop.x - 4, drop.y);
+        ctx.closePath();
+        ctx.fill();
+      } else {
+        ctx.fillRect(drop.x - 3, drop.y - 3, 6, 6);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(drop.x - 1, drop.y - 1, 2, 2);
+      }
+
+      // 4. 悬浮文字标牌 (DNF / 暗黑样式)
+      if (drop.label) {
+        ctx.font = 'bold 9px ui-monospace, monospace';
+        const textMetrics = ctx.measureText(drop.label);
+        const tagW = textMetrics.width + 8;
+        const tagH = 13;
+        const tagX = drop.x - tagW * 0.5;
+        const tagY = drop.y - 16;
+
+        ctx.fillStyle = 'rgba(18, 16, 22, 0.88)';
+        ctx.fillRect(tagX, tagY, tagW, tagH);
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(tagX, tagY, tagW, tagH);
+
+        ctx.fillStyle = color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(drop.label, drop.x, tagY + tagH * 0.5);
+      }
+
+      ctx.restore();
+    }
+  }
+
+  /**
+   * 绘制三大神技招牌全屏动效 (Q/W/E)
+   */
+  renderSkillEffects(hero) {
+    if (!this.activeSkills || this.activeSkills.length === 0) return;
+    const ctx = this.ctx;
+    const groundY = this.height - 30;
+    const remaining = [];
+
+    for (const skill of this.activeSkills) {
+      skill.age += 16.6;
+      const progress = Math.min(1.0, skill.age / skill.duration);
+
+      ctx.save();
+
+      if (skill.key === 'Q') {
+        // Q: 极·拔刀斩 —— 全屏横穿皎洁银蓝月弧剑气
+        const waveX = skill.heroX + progress * (this.width - skill.heroX + 100);
+        const waveY = groundY - 18;
+        const waveH = 48 + progress * 24;
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.beginPath();
+        ctx.ellipse(waveX, waveY, 14, waveH * 0.5, 0.15, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#00e5ff';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(waveX - 10, waveY, waveH * 0.55, -Math.PI * 0.45, Math.PI * 0.45);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(waveX - 12, waveY, waveH * 0.5, -Math.PI * 0.4, Math.PI * 0.4);
+        ctx.stroke();
+
+        if (progress < 0.6) {
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(skill.heroX, waveY);
+          ctx.lineTo(this.width, waveY - 4);
+          ctx.stroke();
+        }
+      } else if (skill.key === 'W') {
+        // W: 虚空裂地斩 —— 跃空砸地，3 柱暗红地裂岩浆喷发
+        const geyserXs = [skill.heroX + 50, skill.heroX + 115, skill.heroX + 185];
+        geyserXs.forEach((gx, idx) => {
+          const delay = idx * 0.12;
+          if (progress >= delay) {
+            const pLocal = Math.min(1.0, (progress - delay) / 0.7);
+            const eruptH = Math.sin(pLocal * Math.PI) * 75;
+
+            ctx.fillStyle = '#ff3b30';
+            ctx.fillRect(gx - 14, groundY - 2, 28, 4);
+
+            const grad = ctx.createLinearGradient(gx, groundY, gx, groundY - eruptH);
+            grad.addColorStop(0, 'rgba(255, 60, 40, 0.9)');
+            grad.addColorStop(0.6, 'rgba(255, 140, 0, 0.8)');
+            grad.addColorStop(1, 'rgba(255, 255, 200, 0.1)');
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(gx - 10, groundY);
+            ctx.lineTo(gx, groundY - eruptH);
+            ctx.lineTo(gx + 10, groundY);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = '#ffcc00';
+            ctx.fillRect(gx - 4 + Math.sin(pLocal * 10) * 8, groundY - eruptH - 5, 3, 3);
+          }
+        });
+      } else if (skill.key === 'E') {
+        // E: 觉醒·剑刃风暴 —— 幻影疾行 16 连斩与破空雷爆
+        const phantomOffsets = [
+          { dx: 40, dy: -20, color: '#fad65a' },
+          { dx: 90, dy: -35, color: '#a26cdb' },
+          { dx: 140, dy: -15, color: '#00e5ff' },
+          { dx: 190, dy: -28, color: '#ffffff' }
+        ];
+
+        phantomOffsets.forEach((po) => {
+          const cutX = skill.heroX + po.dx;
+          const cutY = groundY + po.dy;
+
+          ctx.strokeStyle = po.color;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(cutX - 18, cutY - 14);
+          ctx.lineTo(cutX + 18, cutY + 14);
+          ctx.moveTo(cutX + 18, cutY - 14);
+          ctx.lineTo(cutX - 18, cutY + 14);
+          ctx.stroke();
+        });
+
+        if (progress > 0.6) {
+          const thunderX = skill.heroX + 120;
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(thunderX, 0);
+          ctx.lineTo(thunderX - 8, groundY * 0.4);
+          ctx.lineTo(thunderX + 10, groundY * 0.7);
+          ctx.lineTo(thunderX, groundY);
+          ctx.stroke();
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+          ctx.beginPath();
+          ctx.arc(thunderX, groundY, 35 * (progress - 0.6) * 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      ctx.restore();
+
+      if (progress < 1.0) {
+        remaining.push(skill);
+      }
+    }
+
+    this.activeSkills = remaining;
   }
 
   /**
@@ -224,18 +530,28 @@ export class IdleViewport {
     ctx.save();
     ctx.translate(x, y);
 
-    // 强化光效光环 (+10 紫气，+12 金焰)
+    // 强化光效光环 (+10 紫气，+12 金焰与雷芒)
     const rfLevel = weapon ? (weapon.reinforceLevel || 0) : 0;
     if (rfLevel >= 12) {
-      ctx.fillStyle = 'rgba(250, 214, 90, 0.25)';
+      ctx.fillStyle = 'rgba(250, 214, 90, 0.28)';
       ctx.beginPath();
-      ctx.arc(0, -22, 26 + Math.sin(Date.now() * 0.01) * 3, 0, Math.PI * 2);
+      ctx.arc(0, -22, 28 + Math.sin(Date.now() * 0.015) * 4, 0, Math.PI * 2);
       ctx.fill();
+      // 金色雷芒粒子拖尾
+      ctx.fillStyle = '#fff4a3';
+      for (let i = 0; i < 3; i++) {
+        const sx = 10 + Math.sin(Date.now() * 0.02 + i) * 12;
+        const sy = -28 + Math.cos(Date.now() * 0.02 + i) * 6;
+        ctx.fillRect(sx, sy, 2, 2);
+      }
     } else if (rfLevel >= 10) {
-      ctx.fillStyle = 'rgba(162, 108, 219, 0.25)';
+      ctx.fillStyle = 'rgba(162, 108, 219, 0.28)';
       ctx.beginPath();
-      ctx.arc(0, -22, 22 + Math.sin(Date.now() * 0.01) * 2, 0, Math.PI * 2);
+      ctx.arc(0, -22, 23 + Math.sin(Date.now() * 0.012) * 2, 0, Math.PI * 2);
       ctx.fill();
+      // 紫气拖尾
+      ctx.fillStyle = '#e4c3ff';
+      ctx.fillRect(16 + Math.sin(Date.now() * 0.01) * 6, -29, 2, 2);
     }
 
     // 简易高精硬边像素剑士 (兜帽披风、流浪皮甲、长剑)

@@ -107,6 +107,35 @@ self.onmessage = function (e) {
       break;
     }
 
+    case 'CAST_SKILL': {
+      if (engine && payload && payload.key) {
+        const events = [];
+        engine.castSkill(payload.key, events);
+        self.postMessage({
+          type: 'SNAPSHOT',
+          snapshot: engine.getStateSnapshot(),
+          events
+        });
+      }
+      break;
+    }
+
+    case 'TOGGLE_AUTO_CAST': {
+      if (engine) {
+        if (payload && payload.enable !== undefined) {
+          engine.autoCastSkills = Boolean(payload.enable);
+        } else {
+          engine.autoCastSkills = !engine.autoCastSkills;
+        }
+        self.postMessage({
+          type: 'SNAPSHOT',
+          snapshot: engine.getStateSnapshot(),
+          events: []
+        });
+      }
+      break;
+    }
+
     case 'LOAD_SAVE': {
       if (engine && payload) {
         if (payload.wallet) Object.assign(engine.wallet, payload.wallet);

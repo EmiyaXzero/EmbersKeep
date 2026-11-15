@@ -42,6 +42,29 @@
     <!-- 1. 左侧横版长廊 Canvas 视口 (55% 宽度) -->
     <div class="dock-viewport-col">
       <canvas id="dock-canvas"></canvas>
+
+      <!-- 技能与自动施法 HUD 快捷栏 (底部悬浮微操) -->
+      <div class="hud-skills-bar" id="hud-skills-bar">
+        <button class="skill-card" id="btn-skill-q" data-key="Q" title="[Q] 极·拔刀斩 (8秒CD，全屏剑气横扫)">
+          <div class="skill-cd-mask" id="skill-cd-q"></div>
+          <span class="skill-key">Q</span>
+          <span class="skill-name">拔刀</span>
+        </button>
+        <button class="skill-card" id="btn-skill-w" data-key="W" title="[W] 虚空裂地斩 (14秒CD，跃空三重地裂)">
+          <div class="skill-cd-mask" id="skill-cd-w"></div>
+          <span class="skill-key">W</span>
+          <span class="skill-name">裂地</span>
+        </button>
+        <button class="skill-card" id="btn-skill-e" data-key="E" title="[E] 觉醒·剑刃风暴 (28秒CD，16连斩破空雷爆)">
+          <div class="skill-cd-mask" id="skill-cd-e"></div>
+          <span class="skill-key">E</span>
+          <span class="skill-name">风暴</span>
+        </button>
+        <button class="btn-autocast active" id="btn-auto-cast" title="点击切换 自动/手动 施法">
+          <span class="autocast-icon">⚡</span>
+          <span class="autocast-text">自动</span>
+        </button>
+      </div>
     </div>
 
     <!-- 2. 中间角色数值与裂隙雷达 (22% 宽度) -->

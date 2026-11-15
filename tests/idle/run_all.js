@@ -17,7 +17,8 @@ const __dirname = path.dirname(__filename);
 const suites = [
   { name: 'Task 1: 12部位装备系统 & 战力公式', file: 'equipment.test.js' },
   { name: 'Task 2: 秘银锻炉强化 & 碎裂保底', file: 'forge.test.js' },
-  { name: 'Task 3: 战斗状态机 & 裂隙方尖碑Boss循环', file: 'battle.test.js' }
+  { name: 'Task 3: 战斗状态机 & 裂隙方尖碑Boss循环', file: 'battle.test.js' },
+  { name: 'Task 4: 三大神技 & 地面物理喷装与磁吸系统', file: 'skill.test.js' }
 ];
 
 console.log('====================================================');

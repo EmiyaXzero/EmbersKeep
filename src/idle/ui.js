@@ -177,6 +177,33 @@ export class IdleUI {
         this.client.forgeItem(this.forgeTargetItem);
       };
     }
+
+    // 三大主动神技 (Q/W/E) 与自动施法切换
+    ['Q', 'W', 'E'].forEach(key => {
+      const btn = document.getElementById(`btn-skill-${key.toLowerCase()}`);
+      if (btn) {
+        btn.onclick = () => {
+          this.client.castSkill(key);
+        };
+      }
+    });
+
+    const btnAutoCast = document.getElementById('btn-auto-cast');
+    if (btnAutoCast) {
+      btnAutoCast.onclick = () => {
+        const current = this.latestSnapshot ? this.latestSnapshot.autoCastSkills : true;
+        this.client.toggleAutoCast(!current);
+      };
+    }
+
+    // 全局快捷键监听 (Q/W/E 战技直发)
+    window.addEventListener('keydown', (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+      const key = e.key ? e.key.toUpperCase() : '';
+      if (['Q', 'W', 'E'].includes(key)) {
+        this.client.castSkill(key);
+      }
+    });
   }
 
   /**
@@ -220,6 +247,36 @@ export class IdleUI {
     if (elGold) elGold.textContent = (snap.wallet.gold || 0).toLocaleString();
     if (elCinders) elCinders.textContent = (snap.wallet.cinders || 0).toLocaleString();
     if (elShards) elShards.textContent = (snap.wallet.shards || 0).toLocaleString();
+
+    // 技能冷却遮罩与状态刷新
+    if (snap.skills) {
+      ['Q', 'W', 'E'].forEach(key => {
+        const sk = snap.skills[key];
+        const btn = document.getElementById(`btn-skill-${key.toLowerCase()}`);
+        const mask = document.getElementById(`skill-cd-${key.toLowerCase()}`);
+        if (sk && mask && btn) {
+          const ratio = Math.max(0, Math.min(1, sk.ratio || 0));
+          mask.style.height = `${ratio * 100}%`;
+          if (ratio > 0) {
+            btn.classList.add('on-cd');
+          } else {
+            btn.classList.remove('on-cd');
+          }
+        }
+      });
+    }
+
+    const btnAutoCast = document.getElementById('btn-auto-cast');
+    if (btnAutoCast && snap.autoCastSkills !== undefined) {
+      const textSpan = btnAutoCast.querySelector('.autocast-text');
+      if (snap.autoCastSkills) {
+        btnAutoCast.classList.add('active');
+        if (textSpan) textSpan.textContent = '自动';
+      } else {
+        btnAutoCast.classList.remove('active');
+        if (textSpan) textSpan.textContent = '手动';
+      }
+    }
   }
 
   /**

@@ -140,6 +140,32 @@ export class WorkerClient {
     }
   }
 
+  castSkill(key) {
+    if (this.worker) {
+      this.worker.postMessage({ type: 'CAST_SKILL', payload: { key } });
+    } else if (this.fallbackEngine) {
+      const events = [];
+      const res = this.fallbackEngine.castSkill(key, events);
+      this.lastSnapshot = this.fallbackEngine.getStateSnapshot();
+      this.emit('SNAPSHOT', { snapshot: this.lastSnapshot, events });
+      return res;
+    }
+  }
+
+  toggleAutoCast(enable) {
+    if (this.worker) {
+      this.worker.postMessage({ type: 'TOGGLE_AUTO_CAST', payload: { enable } });
+    } else if (this.fallbackEngine) {
+      if (enable !== undefined) {
+        this.fallbackEngine.autoCastSkills = Boolean(enable);
+      } else {
+        this.fallbackEngine.autoCastSkills = !this.fallbackEngine.autoCastSkills;
+      }
+      this.lastSnapshot = this.fallbackEngine.getStateSnapshot();
+      this.emit('SNAPSHOT', { snapshot: this.lastSnapshot, events: [] });
+    }
+  }
+
   save() {
     if (this.lastSnapshot) {
       try {

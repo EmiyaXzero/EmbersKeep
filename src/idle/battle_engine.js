@@ -54,6 +54,42 @@ export class BattleEngine {
     this.waveNumber = 1;
     this.distanceWalked = 0;
 
+    // 三大主动神技体系 (Q: 极·拔刀斩, W: 虚空裂地斩, E: 觉醒·剑刃风暴)
+    this.skills = {
+      Q: {
+        id: 'skill_q',
+        name: '极·拔刀斩',
+        cd: 8000,
+        currentCd: 0,
+        damageRatio: 3.5,
+        range: 900,
+        shake: 3,
+        description: '拔剑横扫全屏，对前方所有敌人造成 350% 巨额剑气伤害'
+      },
+      W: {
+        id: 'skill_w',
+        name: '虚空裂地斩',
+        cd: 14000,
+        currentCd: 0,
+        damageRatio: 4.8,
+        range: 420,
+        shake: 4,
+        description: '跃空砸地激荡 3 柱暗红地裂，连续重创周围敌群'
+      },
+      E: {
+        id: 'skill_e',
+        name: '觉醒·剑刃风暴',
+        cd: 28000,
+        currentCd: 0,
+        damageRatio: 9.6,
+        range: 650,
+        shake: 5,
+        description: '化身无敌残影突入敌群 16 连斩，收尾触发破空雷爆'
+      }
+    };
+    this.autoCastSkills = config.autoCastSkills !== undefined ? config.autoCastSkills : true;
+    this.groundDrops = []; // 供物理喷装与自动磁吸队列
+
     this.updateHeroStats();
   }
 
@@ -83,9 +119,36 @@ export class BattleEngine {
     // 主角攻击 CD 恢复
     this.hero.attackCooldown = Math.max(0, this.hero.attackCooldown - deltaMs);
 
+    // 技能 CD 恢复
+    if (this.skills) {
+      for (const skill of Object.values(this.skills)) {
+        if (skill.currentCd > 0) {
+          skill.currentCd = Math.max(0, skill.currentCd - deltaMs);
+        }
+      }
+    }
+
     // 生命自动缓回
     if (this.hero.hp < this.hero.maxHp) {
       this.hero.hp = Math.min(this.hero.maxHp, this.hero.hp + Math.round(20 * dtSeconds));
+    }
+
+    // 地面掉落物物理抛物线与自动磁吸
+    this.updateGroundDrops(deltaMs, events);
+
+    // 自动施法判定 (开启时优先开大 E -> W -> Q)
+    if (this.autoCastSkills && this.skills) {
+      const hasTargets = (this.state === 'BOSS_ENCOUNTER' && this.activeBoss) ||
+                         (this.state === 'OBELISK_SPAWN' && this.activeObelisk) ||
+                         (this.monsters.length > 0);
+      if (hasTargets) {
+        for (const key of ['E', 'W', 'Q']) {
+          if (this.skills[key].currentCd === 0) {
+            this.castSkill(key, events);
+            break; // 每次 tick 仅自动触发一个技能
+          }
+        }
+      }
     }
 
     if (this.state === 'NORMAL_GRIND') {
@@ -185,28 +248,18 @@ export class BattleEngine {
       y: this.hero.y
     });
 
-    // 35% 概率掉落【裂隙星石】
+    // 1. 金币物理抛物线喷装 (已记入钱包，设 alreadyCredited: true 避免重复加)
+    this.spawnGroundDrop('gold', { amount: gainedGold }, mob.x, this.hero.y, true);
+
+    // 2. 35% 概率掉落【裂隙星石】物理喷装
     if (Math.random() < 0.35) {
-      this.wallet.riftSigils += 1;
-      events.push({ type: 'SIGIL_DROP', count: this.wallet.riftSigils });
+      this.spawnGroundDrop('sigil', { count: 1 }, mob.x, this.hero.y, false);
     }
 
-    // 25% 概率掉落装备
+    // 3. 25% 概率掉落装备物理喷装
     if (Math.random() < 0.25) {
       const drop = generateDrop(this.hero.level, false);
-      if (this.autoDecompose[drop.rarity]) {
-        // 自动分解
-        const yieldData = decomposeItem(drop);
-        this.wallet.gold += yieldData.gold;
-        this.wallet.cinders += yieldData.cinders;
-        this.wallet.shards += yieldData.shards;
-        events.push({ type: 'AUTO_DECOMPOSE', item: drop, yield: yieldData });
-      } else {
-        if (this.inventory.length < 24) {
-          this.inventory.push(drop);
-          events.push({ type: 'LOOT_DROP', item: drop });
-        }
-      }
+      this.spawnGroundDrop('equipment', { item: drop }, mob.x, this.hero.y, false);
     }
   }
 
@@ -261,26 +314,34 @@ export class BattleEngine {
 
       // 石碑碎裂，唤醒裂隙霸主 Boss
       if (this.activeObelisk.hp <= 0) {
-        this.activeObelisk = null;
-        this.state = 'BOSS_ENCOUNTER';
-        this.bossTimer = 60000; // 60秒限时
-
-        const bossMaxHp = Math.round(8000 * (1 + this.hero.level * 0.8));
-        this.activeBoss = {
-          id: 'boss_wolf_overlord',
-          name: '裂隙霸主·暴怒狼王',
-          type: 'boss_wolf',
-          hp: bossMaxHp,
-          maxHp: bossMaxHp,
-          x: 420
-        };
-
-        events.push({
-          type: 'OBELISK_SHATTER',
-          boss: this.activeBoss
-        });
+        this.handleObeliskShattered(events);
       }
     }
+  }
+
+  /**
+   * 方尖碑碎裂结算
+   */
+  handleObeliskShattered(events) {
+    if (!this.activeObelisk) return;
+    this.activeObelisk = null;
+    this.state = 'BOSS_ENCOUNTER';
+    this.bossTimer = 60000; // 60秒限时
+
+    const bossMaxHp = Math.round(8000 * (1 + this.hero.level * 0.8));
+    this.activeBoss = {
+      id: 'boss_wolf_overlord',
+      name: '裂隙霸主·暴怒狼王',
+      type: 'boss_wolf',
+      hp: bossMaxHp,
+      maxHp: bossMaxHp,
+      x: 420
+    };
+
+    events.push({
+      type: 'OBELISK_SHATTER',
+      boss: this.activeBoss
+    });
   }
 
   /**
@@ -308,23 +369,7 @@ export class BattleEngine {
 
       // 击杀胜利判定
       if (this.activeBoss.hp <= 0) {
-        const epicDrop = generateDrop(this.hero.level + 5, true); // Boss 高品阶掉落保底
-        this.inventory.push(epicDrop);
-
-        // 巨量金币与材料
-        this.wallet.gold += 15000 + this.hero.level * 1000;
-        this.wallet.cinders += 25;
-        this.wallet.shards += 8;
-
-        events.push({
-          type: 'EPIC_DROP',
-          item: epicDrop,
-          x: this.activeBoss.x,
-          y: this.hero.y
-        });
-
-        this.activeBoss = null;
-        this.state = 'NORMAL_GRIND';
+        this.handleBossDefeated(events);
         return;
       }
     }
@@ -342,6 +387,179 @@ export class BattleEngine {
 
       this.activeBoss = null;
       this.state = 'NORMAL_GRIND';
+    }
+  }
+
+  /**
+   * 裂隙霸主被击败结算
+   */
+  handleBossDefeated(events) {
+    if (!this.activeBoss) return;
+    const bossX = this.activeBoss.x;
+    const epicDrop = generateDrop(this.hero.level + 5, true); // Boss 高品阶掉落保底
+
+    // 史诗装备入包并生成地面金色光柱物理喷装
+    this.inventory.push(epicDrop);
+    this.spawnGroundDrop('equipment', { item: epicDrop }, bossX, this.hero.y, true);
+
+    // 巨量金币与材料并生成金币喷发效果
+    const bossGold = 15000 + this.hero.level * 1000;
+    this.wallet.gold += bossGold;
+    this.wallet.cinders += 25;
+    this.wallet.shards += 8;
+
+    // 喷发 3 堆大额金币
+    const goldPerPile = Math.round(bossGold / 3);
+    for (let i = 0; i < 3; i++) {
+      this.spawnGroundDrop('gold', { amount: goldPerPile }, bossX + (i - 1) * 20, this.hero.y, true);
+    }
+
+    events.push({
+      type: 'EPIC_DROP',
+      item: epicDrop,
+      x: bossX,
+      y: this.hero.y
+    });
+
+    this.activeBoss = null;
+    this.state = 'NORMAL_GRIND';
+  }
+
+  /**
+   * 生成物理抛物线地面掉落物
+   */
+  spawnGroundDrop(type, data, originX, originY, alreadyCredited = false) {
+    let rarity = 'common';
+    let label = '';
+    if (type === 'gold') {
+      label = `🪙 +${data.amount}`;
+      rarity = 'common';
+    } else if (type === 'sigil') {
+      label = `💠 裂隙星石 x${data.count || 1}`;
+      rarity = 'rare';
+    } else if (type === 'equipment') {
+      label = `[${data.item.name}]`;
+      rarity = data.item.rarity || 'common';
+    }
+
+    const drop = {
+      id: `drop_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      type,
+      data,
+      rarity,
+      label,
+      x: originX !== undefined ? originX : this.hero.x + 80,
+      y: originY !== undefined ? originY - 10 : this.hero.y - 10,
+      vx: (Math.random() - 0.4) * 220,
+      vy: -(180 + Math.random() * 120),
+      groundY: this.hero.y,
+      bounces: 0,
+      age: 0,
+      isMagnet: false,
+      alreadyCredited
+    };
+
+    this.groundDrops.push(drop);
+    return drop;
+  }
+
+  /**
+   * 地面掉落物物理抛物线与磁吸更新心跳
+   */
+  updateGroundDrops(deltaMs, events) {
+    if (!this.groundDrops || this.groundDrops.length === 0) return;
+    const dt = deltaMs / 1000;
+    const remainingDrops = [];
+
+    for (const drop of this.groundDrops) {
+      drop.age += deltaMs;
+
+      // 磁吸触发检测：落地 600ms 或主角接近 80px 范围
+      if (!drop.isMagnet) {
+        const distToHero = Math.hypot(this.hero.x - drop.x, this.hero.y - drop.y);
+        if (drop.age >= 600 || distToHero <= 80) {
+          drop.isMagnet = true;
+        }
+      }
+
+      if (drop.isMagnet) {
+        // 磁吸飞向英雄
+        const dx = this.hero.x - drop.x;
+        const dy = (this.hero.y - 15) - drop.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist <= 30) {
+          // 触碰英雄，完成拾取
+          this.applyDropReward(drop, events);
+          events.push({
+            type: 'DROP_PICKUP',
+            dropId: drop.id,
+            dropType: drop.type,
+            rarity: drop.rarity,
+            label: drop.label,
+            data: drop.data,
+            x: this.hero.x,
+            y: this.hero.y
+          });
+          continue; // 拾取后从地面移除
+        }
+
+        // 磁吸速度限制单步最大位移（防穿透）
+        const moveDt = Math.min(dt, 0.1);
+        const speed = Math.min(600, Math.max(260, dist * 3.8));
+        drop.x += (dx / dist) * speed * moveDt;
+        drop.y += (dy / dist) * speed * moveDt;
+      } else {
+        // 重力自由落体
+        drop.vy += 700 * dt;
+        drop.x += drop.vx * dt;
+        drop.y += drop.vy * dt;
+
+        // 地面碰撞与弹性反弹
+        if (drop.y >= drop.groundY) {
+          drop.y = drop.groundY;
+          if (drop.bounces < 2) {
+            drop.vy = -drop.vy * 0.4;
+            drop.vx *= 0.6;
+            drop.bounces += 1;
+          } else {
+            drop.vy = 0;
+            drop.vx = 0;
+          }
+        }
+      }
+
+      remainingDrops.push(drop);
+    }
+
+    this.groundDrops = remainingDrops;
+  }
+
+  /**
+   * 掉落物拾取入包奖励结算
+   */
+  applyDropReward(drop, events) {
+    if (drop.alreadyCredited) return;
+
+    if (drop.type === 'gold') {
+      this.wallet.gold += drop.data.amount;
+    } else if (drop.type === 'sigil') {
+      this.wallet.riftSigils += (drop.data.count || 1);
+      events.push({ type: 'SIGIL_DROP', count: this.wallet.riftSigils });
+    } else if (drop.type === 'equipment') {
+      const item = drop.data.item;
+      if (this.autoDecompose[item.rarity]) {
+        const yieldData = decomposeItem(item);
+        this.wallet.gold += yieldData.gold;
+        this.wallet.cinders += yieldData.cinders;
+        this.wallet.shards += yieldData.shards;
+        events.push({ type: 'AUTO_DECOMPOSE', item, yield: yieldData });
+      } else {
+        if (this.inventory.length < 24) {
+          this.inventory.push(item);
+          events.push({ type: 'LOOT_DROP', item });
+        }
+      }
     }
   }
 
@@ -414,6 +632,87 @@ export class BattleEngine {
   }
 
   /**
+   * 释放主动神技 (Q / W / E)
+   */
+  castSkill(skillKey, targetEvents = null) {
+    const skill = this.skills ? this.skills[skillKey] : null;
+    if (!skill) return { success: false, error: 'UNKNOWN_SKILL' };
+    if (skill.currentCd > 0) {
+      return { success: false, error: 'ON_COOLDOWN', remainingCd: skill.currentCd };
+    }
+
+    // 目标收集
+    const targets = [];
+    if (this.state === 'BOSS_ENCOUNTER' && this.activeBoss) {
+      targets.push(this.activeBoss);
+    } else if (this.state === 'OBELISK_SPAWN' && this.activeObelisk) {
+      targets.push(this.activeObelisk);
+    } else {
+      for (const m of this.monsters) {
+        if (Math.abs(m.x - this.hero.x) <= skill.range) {
+          targets.push(m);
+        }
+      }
+    }
+
+    // 进入冷却
+    skill.currentCd = skill.cd;
+
+    const baseAtk = this.hero.stats ? (this.hero.stats.attack || 50) : 50;
+    const isCrit = Math.random() < ((this.hero.stats && this.hero.stats.critRate) || 0.1);
+    const critMult = isCrit ? 1.5 : 1.0;
+    const damage = Math.round(baseAtk * skill.damageRatio * critMult * (0.95 + Math.random() * 0.1));
+
+    const eventsList = targetEvents || [];
+
+    targets.forEach(target => {
+      target.hp -= damage;
+      eventsList.push({
+        type: 'DAMAGE_NUMBER',
+        x: target.x,
+        y: this.hero.y - 30,
+        damage,
+        isCrit,
+        isSkill: true,
+        skillKey
+      });
+
+      // 击杀判定
+      if (target.hp <= 0) {
+        if (this.state === 'NORMAL_GRIND') {
+          this.monsters = this.monsters.filter(m => m.id !== target.id);
+          this.handleMobKilled(target, eventsList);
+        } else if (this.state === 'OBELISK_SPAWN' && target.id === this.activeObelisk?.id) {
+          this.handleObeliskShattered(eventsList);
+        } else if (this.state === 'BOSS_ENCOUNTER' && target.id === this.activeBoss?.id) {
+          this.handleBossDefeated(eventsList);
+        }
+      }
+    });
+
+    const castEvent = {
+      type: 'SKILL_CAST',
+      skillKey,
+      name: skill.name,
+      damage,
+      isCrit,
+      shake: skill.shake,
+      range: skill.range,
+      heroX: this.hero.x,
+      heroY: this.hero.y,
+      hitCount: targets.length
+    };
+    eventsList.push(castEvent);
+
+    return {
+      success: true,
+      skill,
+      event: castEvent,
+      hitCount: targets.length
+    };
+  }
+
+  /**
    * 获取状态快照 (供 Canvas 渲染器与 UI 显示)
    */
   getStateSnapshot() {
@@ -430,6 +729,13 @@ export class BattleEngine {
         x: this.hero.x,
         y: this.hero.y
       },
+      skills: this.skills ? {
+        Q: { cd: this.skills.Q.cd, currentCd: this.skills.Q.currentCd, name: this.skills.Q.name, ratio: this.skills.Q.currentCd / this.skills.Q.cd },
+        W: { cd: this.skills.W.cd, currentCd: this.skills.W.currentCd, name: this.skills.W.name, ratio: this.skills.W.currentCd / this.skills.W.cd },
+        E: { cd: this.skills.E.cd, currentCd: this.skills.E.currentCd, name: this.skills.E.name, ratio: this.skills.E.currentCd / this.skills.E.cd }
+      } : {},
+      autoCastSkills: this.autoCastSkills,
+      groundDrops: (this.groundDrops || []).map(d => ({ ...d })),
       equippedMap: { ...this.equippedMap },
       inventory: [...this.inventory],
       wallet: { ...this.wallet },
