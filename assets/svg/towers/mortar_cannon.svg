@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" shape-rendering="crispEdges">
+  <!-- 沉重原木炮架 -->
+  <rect x="4" y="22" width="24" height="8" fill="#2E1C14"/>
+  <rect x="6" y="20" width="20" height="3" fill="#4A2E20"/>
+  <rect x="8" y="24" width="4" height="4" fill="#C89B3C"/>
+  <rect x="20" y="24" width="4" height="4" fill="#C89B3C"/>
+  <!-- 粗壮臼炮身管 (45度仰角) -->
+  <rect x="10" y="11" width="12" height="10" fill="#1C1824"/>
+  <rect x="8" y="9" width="14" height="6" fill="#3D3448"/>
+  <rect x="7" y="6" width="14" height="5" fill="#5C5266"/>
+  <!-- 宽大炮口与引信火星 -->
+  <rect x="6" y="4" width="14" height="3" fill="#0D0B12"/>
+  <rect x="8" y="5" width="10" height="2" fill="#F97316"/>
+  <rect x="12" y="2" width="2" height="3" fill="#FAD65A"/>
+  <rect x="13" y="1" width="1" height="2" fill="#FFFFFF"/>
+  <!-- 备用炮弹堆 -->
+  <rect x="24" y="18" width="4" height="4" fill="#1C1824"/>
+  <rect x="25" y="15" width="3" height="3" fill="#3D3448"/>
+</svg>

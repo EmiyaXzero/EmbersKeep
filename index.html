@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>《余烬守夜》（EmbersKeep）- 暗黑奇幻卡牌塔防</title>
+  <!-- 纯本地依赖，绝不依赖外网 CDN，保证瞬间加载完全不卡死 -->
+  <link rel="stylesheet" href="src/style.css?v=2.0">
+</head>
+<body>
+
+  <div id="game-container">
+    <!-- 四角哥特式金属包角装饰 -->
+    <div class="corner-ornament top-left"></div>
+    <div class="corner-ornament top-right"></div>
+    <div class="corner-ornament bottom-left"></div>
+    <div class="corner-ornament bottom-right"></div>
+
+    <!-- 顶部状态栏 HUD (Dark Fantasy Diegetic Bar) -->
+    <header id="hud-top">
+      <!-- 1. 基地圣炉生命核心 -->
+      <div class="hud-hearth-cluster">
+        <div class="hearth-gem">
+          <div class="gem-flame"></div>
+        </div>
+        <div class="hearth-meter-box">
+          <div class="meter-header">
+            <span class="meter-title">SANCTUM 圣坛</span>
+            <span class="meter-val" id="hud-hp-text">1000 / 1000</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill" id="hud-hp-bar" style="width: 100%;"></div>
+            <div class="meter-shield-flash" id="hud-shield-flash"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 波次进度轨迹 (Wave Progress Rail) -->
+      <div class="wave-rail-container">
+        <div class="wave-title-row">
+          <span class="wave-label">PHASE</span>
+          <span class="wave-count" id="hud-wave-count">第 1 / 5 波</span>
+        </div>
+        <div class="wave-track">
+          <div class="wave-step current" id="w-step-1"><span>I</span></div>
+          <div class="wave-line"></div>
+          <div class="wave-step" id="w-step-2"><span>II</span></div>
+          <div class="wave-line"></div>
+          <div class="wave-step" id="w-step-3"><span>III</span></div>
+          <div class="wave-line"></div>
+          <div class="wave-step" id="w-step-4"><span>IV</span></div>
+          <div class="wave-line"></div>
+          <div class="wave-step boss" id="w-step-5"><span title="首领决战">💀</span></div>
+        </div>
+      </div>
+
+      <!-- 3. 核心资源储备栏 (无折行精雕小标) -->
+      <div class="resource-cache">
+        <div class="res-pill wolf" title="风狼核心：击败风狼掉落，用于变异疾风双联与高反伤">
+          <div class="res-icon">🐺</div>
+          <div class="res-data">
+            <span class="res-name">狼核</span>
+            <span class="res-num" id="val-wolf">2</span>
+          </div>
+        </div>
+
+        <div class="res-pill thunder" title="雷兽核心：精英雷兽掉落，用于变异四重电弧连锁闪电">
+          <div class="res-icon">⚡</div>
+          <div class="res-data">
+            <span class="res-name">雷晶</span>
+            <span class="res-num" id="val-thunder">1</span>
+          </div>
+        </div>
+
+        <div class="res-pill scrap" title="废铁矿石：战场拾取，用于战地设施升阶强化与图纸锻造">
+          <div class="res-icon">⛓️</div>
+          <div class="res-data">
+            <span class="res-name">废铁</span>
+            <span class="res-num" id="val-scrap">10</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. 战地指令按钮群 -->
+      <div class="hud-action-cluster">
+        <button class="cmd-btn primary" id="btn-wave">
+          <span class="btn-glow"></span>
+          <span class="btn-text">▶ 出征</span>
+          <span class="btn-hotkey">[Space]</span>
+        </button>
+        <button class="cmd-btn secondary" id="btn-forge">
+          <span class="btn-text">🔨 铸炉</span>
+          <span class="btn-hotkey">[F]</span>
+        </button>
+        <a href="gallery.html" class="cmd-btn" title="查看第一章怪物逐帧动画与12张防御卡牌全景演播厅" style="text-decoration: none;">
+          <span class="btn-text">🎨 演播厅</span>
+        </a>
+        <a href="pixelforge/index.html" class="cmd-btn" title="打开 PixelForge AI 像素工坊工作台" style="text-decoration: none;">
+          <span class="btn-text">⚡ 像素工坊</span>
+        </a>
+        <button class="cmd-btn icon-only" id="btn-speed" title="调节游戏速度">
+          <span class="btn-text">⏩ 1x</span>
+        </button>
+        <button class="cmd-btn icon-only" id="btn-mute" title="开关音效">
+          <span class="btn-text">🔊</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 悬浮微光战术指引 -->
+    <div id="hud-hint">
+      <span class="hint-gem">✦</span>
+      <span class="hint-text">点击战场设施可立即【升阶强化】与【核心融合变异】 · 按键盘 [1~4] 秒选卡牌</span>
+      <span class="hint-gem">✦</span>
+    </div>
+
+    <!-- 游戏主画布 (45度等轴暗黑要塞战场) -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- 底部实体手牌战壕卡带 (Deck Rail) -->
+    <nav id="hud-bottom">
+      <div class="deck-scroll-container" id="deck-cards"></div>
+    </nav>
+
+    <!-- 弹窗遮罩层 (铸炉工坊 / 肉鸽三选一 / 战地强化) -->
+    <div id="modal-overlay" class="modal-overlay">
+      <div id="modal-container" class="modal-content"></div>
+    </div>
+  </div>
+
+  <script src="src/audio.js?v=2.0"></script>
+  <script src="src/game.js?v=2.0"></script>
+</body>
+</html>

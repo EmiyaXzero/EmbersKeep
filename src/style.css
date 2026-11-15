@@ -1,0 +1,945 @@
+/* ==========================================================================
+   《余烬守夜》（EmbersKeep）Dark Fantasy Core Design System
+   ========================================================================== */
+
+:root {
+  --bg-deep: #09070c;
+  --bg-stone: #141019;
+  --bg-surface: #1b1622;
+  --bg-card: #211c2a;
+  
+  --gold-highlight: #ffe39a;
+  --gold-primary: #fad65a;
+  --gold-antique: #c89b3c;
+  --gold-bronze: #7f6024;
+  
+  --iron-rim: #3d3448;
+  --iron-dark: #221c29;
+  --iron-highlight: #5b4f6b;
+  
+  --ember-flame: #f28929;
+  --ember-crimson: #d94126;
+  --ember-glow: rgba(242, 137, 41, 0.35);
+  
+  --arcane-thunder: #55a4db;
+  --arcane-wolf: #5eead4;
+  --arcane-void: #a855f7;
+  --blood-red: #e11d48;
+  --life-green: #24a163;
+  
+  --font-serif: "Cinzel", "Times New Roman", "Songti SC", "SimSun", serif;
+  --font-mono: "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  background-color: var(--bg-deep);
+  background-image: 
+    radial-gradient(circle at 50% 30%, rgba(242, 137, 41, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 50% 90%, rgba(85, 164, 219, 0.04) 0%, transparent 70%);
+  color: #ede8dc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* --------------------------------------------------------------------------
+   游戏主舞台容器与哥特式包角框架
+   -------------------------------------------------------------------------- */
+#game-container {
+  position: relative;
+  width: 960px;
+  height: 640px;
+  background: #0d0b11;
+  border: 2px solid var(--gold-antique);
+  border-radius: 6px;
+  box-shadow: 
+    0 0 0 1px #000,
+    0 0 0 4px var(--iron-dark),
+    0 0 50px rgba(0, 0, 0, 0.95),
+    0 0 25px rgba(242, 137, 41, 0.12);
+  overflow: hidden;
+}
+
+/* 四角哥特式金属角花饰件 */
+.corner-ornament {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  z-index: 25;
+}
+
+.corner-ornament::before,
+.corner-ornament::after {
+  content: "";
+  position: absolute;
+  background: var(--gold-primary);
+  box-shadow: 0 0 6px rgba(250, 214, 90, 0.6);
+}
+
+.corner-ornament.top-left { top: 3px; left: 3px; }
+.corner-ornament.top-left::before { top: 0; left: 0; width: 14px; height: 3px; }
+.corner-ornament.top-left::after { top: 0; left: 0; width: 3px; height: 14px; }
+
+.corner-ornament.top-right { top: 3px; right: 3px; }
+.corner-ornament.top-right::before { top: 0; right: 0; width: 14px; height: 3px; }
+.corner-ornament.top-right::after { top: 0; right: 0; width: 3px; height: 14px; }
+
+.corner-ornament.bottom-left { bottom: 3px; left: 3px; }
+.corner-ornament.bottom-left::before { bottom: 0; left: 0; width: 14px; height: 3px; }
+.corner-ornament.bottom-left::after { bottom: 0; left: 0; width: 3px; height: 14px; }
+
+.corner-ornament.bottom-right { bottom: 3px; right: 3px; }
+.corner-ornament.bottom-right::before { bottom: 0; right: 0; width: 14px; height: 3px; }
+.corner-ornament.bottom-right::after { bottom: 0; right: 0; width: 3px; height: 14px; }
+
+/* 画布层 */
+canvas#game-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  cursor: crosshair;
+}
+
+/* --------------------------------------------------------------------------
+   顶部战役状态栏 HUD (Header Bar)
+   -------------------------------------------------------------------------- */
+#hud-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(180deg, 
+    rgba(13, 10, 17, 0.98) 0%, 
+    rgba(18, 14, 23, 0.94) 75%, 
+    rgba(13, 10, 17, 0.8) 100%
+  );
+  border-bottom: 2px solid var(--iron-rim);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 20;
+}
+
+/* 1. 基地圣炉生命核心集群 */
+.hud-hearth-cluster {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.hearth-gem {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff 0%, #fad65a 30%, #f28929 70%, #85220c 100%);
+  border: 2px solid var(--gold-antique);
+  box-shadow: 0 0 12px var(--ember-flame), inset 0 0 4px #fff;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gem-flame {
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border-radius: 50% 50% 40% 40%;
+  box-shadow: 0 0 10px #fad65a;
+  animation: hearthFlamePulse 1.8s infinite alternate ease-in-out;
+}
+
+@keyframes hearthFlamePulse {
+  0% { transform: scale(0.85) rotate(-3deg); opacity: 0.9; }
+  100% { transform: scale(1.15) rotate(3deg); opacity: 1; filter: drop-shadow(0 0 8px #f28929); }
+}
+
+.hearth-meter-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 130px;
+}
+
+.meter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+.meter-title {
+  color: var(--gold-antique);
+  font-family: var(--font-serif);
+  font-weight: 700;
+}
+
+.meter-val {
+  color: #fff;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.meter-track {
+  height: 9px;
+  background: #110d16;
+  border: 1px solid var(--iron-rim);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #d94126 0%, #f28929 60%, #fad65a 100%);
+  box-shadow: 0 0 8px rgba(242, 137, 41, 0.6);
+  transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.meter-shield-flash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(94, 234, 212, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+/* 2. 波次进度轨迹 (Wave Progress Rail) */
+.wave-rail-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.wave-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.wave-label {
+  color: #8c8299;
+  font-family: var(--font-serif);
+  letter-spacing: 1px;
+  font-size: 9px;
+}
+
+.wave-count {
+  color: var(--gold-primary);
+  font-weight: bold;
+  font-family: var(--font-serif);
+}
+
+.wave-track {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.wave-step {
+  width: 20px;
+  height: 16px;
+  background: #191421;
+  border: 1px solid var(--iron-rim);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 9px;
+  color: #796f86;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.wave-step.current {
+  background: linear-gradient(180deg, #f28929 0%, #9e2a15 100%);
+  border-color: var(--gold-highlight);
+  color: #fff;
+  box-shadow: 0 0 8px rgba(242, 137, 41, 0.7);
+  transform: scale(1.1);
+}
+
+.wave-step.passed {
+  background: #252030;
+  border-color: var(--gold-bronze);
+  color: var(--gold-primary);
+}
+
+.wave-step.boss {
+  border-color: #a855f7;
+  color: #d8b4fe;
+}
+
+.wave-step.boss.current {
+  background: linear-gradient(180deg, #a855f7 0%, #581c87 100%);
+  border-color: #f43f5e;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
+}
+
+.wave-line {
+  width: 6px;
+  height: 2px;
+  background: var(--iron-rim);
+}
+
+/* 3. 核心资源储备栏 (无折行精雕小标) */
+.resource-cache {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.res-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #17121f;
+  border: 1px solid var(--iron-rim);
+  border-radius: 4px;
+  padding: 3px 7px;
+  white-space: nowrap;
+  transition: all 0.2s;
+  cursor: default;
+}
+
+.res-pill:hover {
+  border-color: var(--gold-antique);
+  transform: translateY(-1px);
+}
+
+.res-pill.wolf:hover { border-color: var(--arcane-wolf); box-shadow: 0 0 8px rgba(94, 234, 212, 0.25); }
+.res-pill.thunder:hover { border-color: var(--arcane-thunder); box-shadow: 0 0 8px rgba(85, 164, 219, 0.25); }
+.res-pill.scrap:hover { border-color: var(--gold-primary); box-shadow: 0 0 8px rgba(250, 214, 90, 0.25); }
+
+.res-icon {
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+}
+
+.res-data {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.res-name {
+  font-size: 8px;
+  color: #8c8299;
+}
+
+.res-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.res-pill.wolf .res-num { color: var(--arcane-wolf); }
+.res-pill.thunder .res-num { color: var(--arcane-thunder); }
+.res-pill.scrap .res-num { color: var(--gold-primary); }
+
+/* 4. 战地指令按钮群 */
+.hud-action-cluster {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.cmd-btn {
+  background: linear-gradient(180deg, #2b2436 0%, #1c1724 100%);
+  border: 1px solid var(--iron-rim);
+  color: #ede8dc;
+  border-radius: 4px;
+  padding: 5px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cmd-btn:hover {
+  background: linear-gradient(180deg, #3a3148 0%, #251e2f 100%);
+  border-color: var(--gold-antique);
+  color: var(--gold-highlight);
+  transform: translateY(-1px);
+}
+
+.cmd-btn:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.cmd-btn.primary {
+  background: linear-gradient(180deg, #d94126 0%, #8e2311 100%);
+  border-color: #f28929;
+  box-shadow: 0 0 12px rgba(217, 65, 38, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.cmd-btn.primary:hover {
+  background: linear-gradient(180deg, #f28929 0%, #aa2c15 100%);
+  box-shadow: 0 0 16px rgba(242, 137, 41, 0.6);
+}
+
+.cmd-btn.icon-only {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.btn-hotkey {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-mono);
+}
+
+/* --------------------------------------------------------------------------
+   悬浮微光战术指引条
+   -------------------------------------------------------------------------- */
+#hud-hint {
+  position: absolute;
+  top: 66px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(18, 14, 23, 0.92);
+  border: 1px solid var(--gold-bronze);
+  border-radius: 20px;
+  padding: 4px 18px;
+  font-size: 11px;
+  color: var(--gold-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8), 0 0 8px rgba(200, 155, 60, 0.15);
+  pointer-events: none;
+  z-index: 15;
+  animation: pulseHintFloat 3s infinite ease-in-out;
+}
+
+.hint-gem {
+  color: var(--ember-flame);
+  font-size: 10px;
+}
+
+@keyframes pulseHintFloat {
+  0%, 100% { opacity: 0.88; transform: translateX(-50%) translateY(0); }
+  50% { opacity: 1; transform: translateX(-50%) translateY(-2px); }
+}
+
+/* --------------------------------------------------------------------------
+   底部实体手牌战壕卡带 (Tactile Deck Bar)
+   -------------------------------------------------------------------------- */
+#hud-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 110px;
+  background: linear-gradient(0deg, 
+    rgba(9, 7, 12, 0.98) 0%, 
+    rgba(14, 11, 18, 0.92) 75%, 
+    rgba(14, 11, 18, 0) 100%
+  );
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 8px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.deck-scroll-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+/* 实体卡牌样式 */
+.card-item {
+  width: 74px;
+  height: 98px;
+  background: linear-gradient(180deg, #251e30 0%, #15111c 100%);
+  border: 2px solid var(--iron-rim);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 4px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+  transition: transform 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28), border-color 0.2s, box-shadow 0.2s;
+}
+
+.card-item:hover {
+  transform: translateY(-14px) scale(1.05);
+  border-color: var(--gold-primary);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.9), 0 0 15px rgba(242, 137, 41, 0.4);
+}
+
+.card-item.selected {
+  border-color: var(--gold-primary);
+  background: linear-gradient(180deg, #372a42 0%, #1d1627 100%);
+  transform: translateY(-16px) scale(1.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.95), 0 0 20px var(--gold-primary);
+}
+
+.card-hotkey {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  background: #110d16;
+  border: 1px solid var(--gold-antique);
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  color: var(--gold-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
+}
+
+.card-name-ribbon {
+  font-size: 10px;
+  font-weight: 700;
+  color: #ede8dc;
+  margin-top: 2px;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.card-art-frame {
+  width: 48px;
+  height: 48px;
+  background: #100d14;
+  border: 1px solid rgba(61, 52, 72, 0.8);
+  border-radius: 4px;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.card-art-frame img {
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.7));
+}
+
+.card-stat-pill {
+  margin-top: auto;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  color: var(--gold-primary);
+  background: rgba(17, 13, 22, 0.8);
+  padding: 1px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--iron-rim);
+}
+
+/* --------------------------------------------------------------------------
+   弹窗面板系统 (Modals: 锻造工坊 / 肉鸽三选一 / 战地强化)
+   -------------------------------------------------------------------------- */
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(7, 5, 10, 0.88);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: linear-gradient(180deg, #181321 0%, #100d16 100%);
+  border: 2px solid var(--gold-antique);
+  border-radius: 8px;
+  box-shadow: 
+    0 0 0 1px #000,
+    0 0 45px rgba(0, 0, 0, 0.95), 
+    0 0 25px rgba(200, 155, 60, 0.25);
+  width: 700px;
+  max-height: 550px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalPop 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.93) translateY(8px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.modal-header {
+  padding: 14px 22px;
+  background: rgba(26, 20, 33, 0.8);
+  border-bottom: 1px solid var(--iron-rim);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--gold-primary);
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-close {
+  background: transparent;
+  border: 1px solid var(--iron-rim);
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  color: #9f96aa;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.modal-close:hover {
+  border-color: var(--gold-primary);
+  color: #fff;
+  background: #2b2236;
+}
+
+.modal-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+}
+
+/* 锻造工坊卡片网格 */
+.forge-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.recipe-card {
+  background: #17121f;
+  border: 1px solid var(--iron-rim);
+  border-radius: 6px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.recipe-card:hover {
+  border-color: var(--gold-antique);
+  background: #20192a;
+}
+
+.recipe-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.recipe-header img {
+  width: 44px;
+  height: 44px;
+  image-rendering: pixelated;
+  background: #0f0b14;
+  border: 1px solid var(--iron-rim);
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.recipe-title {
+  font-family: var(--font-serif);
+  font-weight: bold;
+  font-size: 15px;
+  color: #fff;
+}
+
+.recipe-cost {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.recipe-cost span.ok { color: var(--life-green); }
+.recipe-cost span.missing { color: var(--blood-red); }
+
+.recipe-desc {
+  font-size: 12px;
+  color: #9f96aa;
+  line-height: 1.45;
+}
+
+.recipe-btn {
+  margin-top: 4px;
+  background: linear-gradient(180deg, #2d2438 0%, #1a1522 100%);
+  border: 1px solid var(--iron-rim);
+  color: #fff;
+  padding: 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.15s;
+}
+
+.recipe-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #d94126 0%, #8e2311 100%);
+  border-color: var(--gold-primary);
+  color: #fff;
+}
+
+.recipe-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 战地设施升级面板 */
+.upgrade-layout {
+  display: flex;
+  gap: 20px;
+}
+
+.upgrade-sidebar {
+  width: 220px;
+  background: #130f1a;
+  border: 1px solid var(--iron-rim);
+  border-radius: 6px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.upgrade-sidebar img {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  background: #1f182a;
+  border-radius: 6px;
+  padding: 4px;
+  margin-bottom: 10px;
+  border: 1px solid var(--gold-antique);
+}
+
+.upgrade-stat-list {
+  width: 100%;
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.upgrade-stat-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(61, 52, 72, 0.4);
+}
+
+.upgrade-stat-item span:first-child { color: #8c8299; }
+.upgrade-stat-item span:last-child { color: #fff; font-family: var(--font-mono); font-weight: 600; }
+
+.upgrade-actions {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.upgrade-action-card {
+  background: #16111e;
+  border: 1px solid var(--iron-rim);
+  border-radius: 6px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upgrade-action-card.highlight {
+  border-color: rgba(242, 137, 41, 0.5);
+  background: linear-gradient(180deg, #1f172a 0%, #15101d 100%);
+}
+
+.upgrade-action-card h3 {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--gold-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fusion-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.fusion-btn {
+  background: #231c2d;
+  border: 1px solid var(--iron-rim);
+  color: #fff;
+  padding: 9px;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fusion-btn:hover:not(:disabled) {
+  border-color: var(--ember-flame);
+  background: #31263e;
+  transform: translateY(-2px);
+}
+
+.fusion-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.fusion-btn .f-title { font-weight: bold; font-size: 12px; color: #fff; }
+.fusion-btn .f-cost { font-size: 10px; color: var(--gold-primary); font-family: var(--font-mono); }
+.fusion-btn .f-desc { font-size: 11px; color: #9f96aa; line-height: 1.35; }
+
+/* 肉鸽技能三选一 */
+.perk-container {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.perk-card {
+  flex: 1;
+  background: #17121f;
+  border: 2px solid var(--iron-rim);
+  border-radius: 8px;
+  padding: 18px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.perk-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--gold-primary);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 15px var(--ember-glow);
+}
+
+.perk-card.rare { border-color: var(--arcane-thunder); }
+.perk-card.epic { border-color: var(--arcane-void); }
+
+.perk-tag {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(242, 137, 41, 0.2);
+  color: var(--gold-primary);
+  margin-bottom: 10px;
+}
+
+.perk-title {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.perk-desc {
+  font-size: 12px;
+  color: #9f96aa;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.perk-select-btn {
+  margin-top: auto;
+  background: #261f30;
+  border: 1px solid var(--iron-rim);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.perk-card:hover .perk-select-btn {
+  background: var(--ember-flame);
+  border-color: var(--gold-primary);
+}

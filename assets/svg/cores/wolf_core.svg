@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" shape-rendering="crispEdges">
+  <!-- 风狼核心：青绿色疾风魔核 -->
+  <rect x="12" y="6" width="8" height="20" fill="#164E33"/>
+  <rect x="8" y="10" width="16" height="12" fill="#1D7C4D"/>
+  <rect x="10" y="8" width="12" height="16" fill="#24A163"/>
+  <rect x="14" y="10" width="4" height="12" fill="#5EEAD4"/>
+  <rect x="15" y="12" width="2" height="8" fill="#CCFBF1"/>
+  <!-- 环绕风纹 -->
+  <rect x="6" y="14" width="2" height="4" fill="#5EEAD4"/>
+  <rect x="24" y="14" width="2" height="4" fill="#5EEAD4"/>
+  <rect x="14" y="4" width="4" height="2" fill="#5EEAD4"/>
+  <rect x="14" y="26" width="4" height="2" fill="#5EEAD4"/>
+</svg>

@@ -1,0 +1,48 @@
+{
+  "monsters": [
+    {
+      "id": "mob_ashen_wolf",
+      "name": "灰烬狼",
+      "chapter": 1,
+      "max_hp": 90,
+      "move_speed": 75,
+      "attack_power": 12,
+      "armor": 2,
+      "texture_1x": "assets/textures/1x/monsters/ashen_wolf.png",
+      "drops": [
+        {"item_id": "core_wolf", "rate": 0.25},
+        {"item_id": "mat_iron_scrap", "rate": 0.8}
+      ],
+      "description": "废土边缘由残烬聚成的掠食野兽，移动迅捷。"
+    },
+    {
+      "id": "mob_crawler",
+      "name": "灰潮爬行者",
+      "chapter": 1,
+      "max_hp": 160,
+      "move_speed": 45,
+      "attack_power": 20,
+      "armor": 5,
+      "drops": [
+        {"item_id": "mat_chitin_plate", "rate": 0.4}
+      ],
+      "description": "拥有轻度甲壳的灰潮初阶先锋。"
+    },
+    {
+      "id": "boss_wolf_alpha",
+      "name": "灰狼首领·残烬之影",
+      "chapter": 1,
+      "is_boss": true,
+      "max_hp": 2400,
+      "move_speed": 60,
+      "attack_power": 65,
+      "armor": 12,
+      "drops": [
+        {"item_id": "core_alpha_wolf", "rate": 1.0},
+        {"item_id": "hearth_fragment_1", "rate": 1.0}
+      ],
+      "skills": ["dash_slash", "howl_summon_minions"],
+      "description": "第一章守关首领，体内蕴含第一枚天穹炉心碎片。"
+    }
+  ]
+}

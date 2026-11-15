@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" shape-rendering="crispEdges">
+  <!-- 铁环底盘 -->
+  <rect x="6" y="22" width="20" height="4" fill="#1C1824"/>
+  <rect x="8" y="24" width="16" height="2" fill="#3D3448"/>
+  <rect x="14" y="22" width="4" height="2" fill="#C89B3C"/>
+  <!-- 铰链弹簧轴 -->
+  <rect x="15" y="18" width="2" height="5" fill="#5C5266"/>
+  <!-- 锯齿铁夹 (张开待击发态) -->
+  <rect x="6" y="14" width="4" height="8" fill="#2C2636"/>
+  <rect x="5" y="12" width="3" height="4" fill="#5C5266"/>
+  <rect x="7" y="11" width="2" height="3" fill="#A69CB3"/>
+  <rect x="22" y="14" width="4" height="8" fill="#2C2636"/>
+  <rect x="24" y="12" width="3" height="4" fill="#5C5266"/>
+  <rect x="23" y="11" width="2" height="3" fill="#A69CB3"/>
+  <!-- 尖锐倒刺与血痕 -->
+  <rect x="8" y="12" width="2" height="3" fill="#D94126"/>
+  <rect x="22" y="12" width="2" height="3" fill="#D94126"/>
+  <!-- 锁地链条 -->
+  <rect x="3" y="25" width="4" height="2" fill="#5C5266"/>
+  <rect x="25" y="25" width="4" height="2" fill="#5C5266"/>
+</svg>

@@ -1,0 +1,153 @@
+{
+  "blueprints": [
+    {
+      "id": "bp_crossbow_tower",
+      "name": "基础弩箭塔",
+      "category": "tower",
+      "damage_type": "physical",
+      "base_damage": 26,
+      "attack_speed": 1.2,
+      "attack_range": 220,
+      "texture_1x": "assets/textures/1x/towers/crossbow_turret.png",
+      "texture_2x": "assets/textures/2x/towers/crossbow_turret.png",
+      "description": "发射实木弩箭的标准防御塔，攻守平衡。"
+    },
+    {
+      "id": "bp_flame_altar",
+      "name": "火焰祭坛",
+      "category": "tower",
+      "damage_type": "fire",
+      "base_damage": 14,
+      "attack_speed": 0.6,
+      "attack_range": 170,
+      "aoe_radius": 65,
+      "texture_1x": "assets/textures/1x/towers/flame_altar.png",
+      "texture_2x": "assets/textures/2x/towers/flame_altar.png",
+      "description": "向前方扇形区域持续喷射炉火余烬，极克密集群怪。"
+    },
+    {
+      "id": "bp_stone_wall",
+      "name": "防御石墙",
+      "category": "barrier",
+      "damage_type": "physical",
+      "max_hp": 900,
+      "reflect_percent": 0.5,
+      "texture_1x": "assets/textures/1x/towers/stone_wall.png",
+      "texture_2x": "assets/textures/2x/towers/stone_wall.png",
+      "description": "阻挡地面怪物的花岗岩防御壁，提供反弹反噬与圣火庇护。"
+    },
+    {
+      "id": "bp_snare_trap",
+      "name": "捕兽棘刺陷阱",
+      "category": "trap",
+      "damage_type": "physical",
+      "base_damage": 45,
+      "charges": 6,
+      "slow_percent": 0.5,
+      "texture_1x": "assets/textures/1x/towers/snare_trap.png",
+      "texture_2x": "assets/textures/2x/towers/snare_trap.png",
+      "description": "埋设在阵地的锯齿铁夹，瞬发重创踏入目标并禁锢移动。"
+    },
+    {
+      "id": "card_wind_repeater",
+      "name": "疾风连射弩",
+      "category": "tower",
+      "damage_type": "physical",
+      "base_damage": 22,
+      "attack_speed": 2.6,
+      "attack_range": 240,
+      "burst_count": 2,
+      "texture_1x": "assets/textures/1x/towers/wind_repeater.png",
+      "texture_2x": "assets/textures/2x/towers/wind_repeater.png",
+      "description": "融合风狼核心的双联轻弓，两连发极速射击压制。"
+    },
+    {
+      "id": "card_thunder_ballista",
+      "name": "雷霆脉冲弩",
+      "category": "tower",
+      "damage_type": "lightning",
+      "base_damage": 35,
+      "attack_speed": 1.1,
+      "attack_range": 260,
+      "chain_count": 4,
+      "texture_1x": "assets/textures/1x/towers/thunder_ballista.png",
+      "texture_2x": "assets/textures/2x/towers/thunder_ballista.png",
+      "description": "镶嵌雷兽晶核的巨型重弩，攻击在敌群间传导四重高压电弧。"
+    },
+    {
+      "id": "card_thorns_barricade",
+      "name": "荆棘岩壁",
+      "category": "barrier",
+      "damage_type": "physical",
+      "max_hp": 1500,
+      "reflect_percent": 0.8,
+      "texture_1x": "assets/textures/1x/towers/thorns_barricade.png",
+      "texture_2x": "assets/textures/2x/towers/thorns_barricade.png",
+      "description": "布满黑曜石尖刺与剧毒蔓藤的高阶防壁，反噬80%近战伤害。"
+    },
+    {
+      "id": "card_inferno_shrine",
+      "name": "焚天余烬坛",
+      "category": "tower",
+      "damage_type": "fire",
+      "base_damage": 28,
+      "attack_speed": 0.8,
+      "attack_range": 190,
+      "texture_1x": "assets/textures/1x/towers/inferno_shrine.png",
+      "texture_2x": "assets/textures/2x/towers/inferno_shrine.png",
+      "description": "狂暴燃烧的重铸圣火坛，点燃地面留下持续伤害的焦土火海。"
+    },
+    {
+      "id": "card_frost_spire",
+      "name": "寒霜凝结塔",
+      "category": "tower",
+      "damage_type": "ice",
+      "base_damage": 18,
+      "attack_speed": 1.0,
+      "attack_range": 200,
+      "slow_percent": 0.6,
+      "texture_1x": "assets/textures/1x/towers/frost_spire.png",
+      "texture_2x": "assets/textures/2x/towers/frost_spire.png",
+      "description": "耸立的永冻冰晶尖塔，持续释放刺骨冰环减速冻结敌潮。"
+    },
+    {
+      "id": "card_mortar_cannon",
+      "name": "重型生铁臼炮",
+      "category": "tower",
+      "damage_type": "physical",
+      "base_damage": 65,
+      "attack_speed": 0.45,
+      "attack_range": 280,
+      "aoe_radius": 75,
+      "texture_1x": "assets/textures/1x/towers/mortar_cannon.png",
+      "texture_2x": "assets/textures/2x/towers/mortar_cannon.png",
+      "description": "短管大口径臼炮，发射高爆开花弹引发大范围震荡碎裂。"
+    },
+    {
+      "id": "card_toxic_catapult",
+      "name": "腐蚀酸液投石机",
+      "category": "tower",
+      "damage_type": "poison",
+      "base_damage": 20,
+      "attack_speed": 0.55,
+      "attack_range": 250,
+      "corrosion_debuff": 0.4,
+      "texture_1x": "assets/textures/1x/towers/toxic_catapult.png",
+      "texture_2x": "assets/textures/2x/towers/toxic_catapult.png",
+      "description": "抛掷烈性腐蚀胆汁罐，破除重甲敌人的防御护壳。"
+    },
+    {
+      "id": "card_void_beacon",
+      "name": "虚空引力信标",
+      "category": "beacon",
+      "damage_type": "arcane",
+      "base_damage": 10,
+      "attack_speed": 0.7,
+      "attack_range": 230,
+      "pull_force": 40,
+      "texture_1x": "assets/textures/1x/towers/void_beacon.png",
+      "texture_2x": "assets/textures/2x/towers/void_beacon.png",
+      "description": "引发引力坍缩暗黑漩涡，强行将四散的敌群聚拢吸附至中心。"
+    }
+  ]
+}

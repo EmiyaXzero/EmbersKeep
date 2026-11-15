@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="PixelForge AI 像素工坊 — 面向 2D 独立游戏开发者的矢量像素美术与逐帧动画生产工作台" />
+  <title>PixelForge AI 像素工坊 · EmbersKeep</title>
+  <link rel="stylesheet" href="css/studio.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="brand-text">
+          <h1>PixelForge <span>AI</span></h1>
+          <p>像素工坊 · VECTOR PIXEL WORKBENCH</p>
+        </div>
+      </div>
+
+      <div class="topbar-badges">
+        <span class="chip chip-gold">TRAE 好应用大赏 · 内容创作赛道</span>
+        <span class="chip">16 色硬约束</span>
+        <span class="chip">纯前端离线运行</span>
+      </div>
+
+      <div class="topbar-actions">
+        <a class="btn btn-ghost" href="../index.html" target="_blank" rel="noopener">进入 EmbersKeep 主游戏</a>
+        <button class="btn btn-primary" id="export-btn" type="button">一键导出标准游戏资产包</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="panel panel-assets">
+        <div class="panel-head">
+          <span class="panel-title">预设资产库</span>
+          <span class="panel-meta" id="asset-count">12 塔 / 3 怪</span>
+        </div>
+        <div class="tabs" role="tablist" aria-label="资产分类">
+          <button class="tab is-active" data-tab="tower" id="tab-tower" role="tab" type="button">防御塔 <b>12</b></button>
+          <button class="tab" data-tab="monster" id="tab-monster" role="tab" type="button">怪物 <b>3</b></button>
+        </div>
+        <div class="asset-list" id="asset-list" aria-live="polite"></div>
+        <div class="panel-foot">
+          <button class="btn btn-tiny btn-block" id="custom-toggle" type="button">+ 导入自定义 SVG</button>
+        </div>
+      </aside>
+
+      <section class="panel panel-stage">
+        <div class="stage-head">
+          <div class="stage-title">
+            <span class="stage-kind" id="stage-kind">TOWER</span>
+            <h2 id="stage-name">雷霆脉冲弩</h2>
+            <span class="stage-role" id="stage-role">四重连锁闪电</span>
+          </div>
+          <div class="stage-flags">
+            <span class="flag flag-ok" id="flag-crisp">crispEdges</span>
+            <span class="flag flag-ok" id="flag-grid">GRID 32×32</span>
+            <span class="flag" id="flag-zoom">6×</span>
+          </div>
+        </div>
+
+        <div class="viewport-wrap">
+          <div class="stage-frame">
+            <div class="ruler-corner"></div>
+            <div class="ruler ruler-x" id="ruler-x"></div>
+            <div class="ruler ruler-y" id="ruler-y"></div>
+            <div class="viewport" id="viewport">
+              <canvas id="stage-canvas" width="192" height="192"></canvas>
+              <div class="crt" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="viewport-foot">
+            <span id="viewport-info">32 × 32 px · 6× · 1 帧</span>
+            <span id="viewport-hint">空格播放 · [ ] 逐帧 · 1-4 缩放 · O 洋葱皮 · G 网格</span>
+          </div>
+        </div>
+
+        <div class="transport">
+          <div class="anim-tabs" id="anim-tabs" role="tablist" aria-label="动作状态"></div>
+
+          <div class="transport-main">
+            <button class="btn btn-icon" id="prev-btn" type="button" title="上一帧（[）">◀</button>
+            <button class="btn btn-play" id="play-btn" type="button" title="播放 / 暂停（空格）">
+              <span id="play-icon">▶</span><span id="play-label">播放</span>
+            </button>
+            <button class="btn btn-icon" id="next-btn" type="button" title="下一帧（]）">▶</button>
+
+            <div class="frame-meter">
+              <div class="frame-bar"><i id="frame-progress"></i></div>
+              <span id="frame-label">帧 1 / 4</span>
+            </div>
+
+            <label class="switch" title="洋葱皮（O）">
+              <input type="checkbox" id="onion-toggle" />
+              <span class="switch-track"><span class="switch-knob"></span></span>
+              <span class="switch-text">洋葱皮</span>
+            </label>
+
+            <label class="switch" title="像素网格（G）">
+              <input type="checkbox" id="grid-toggle" checked />
+              <span class="switch-track"><span class="switch-knob"></span></span>
+              <span class="switch-text">像素网格</span>
+            </label>
+          </div>
+
+          <div class="transport-sub">
+            <label class="slider-field" for="fps-slider">
+              <span class="slider-label">帧率 <b id="fps-value">6</b> FPS</span>
+              <input type="range" id="fps-slider" min="1" max="24" step="1" value="6" />
+            </label>
+
+            <div class="zoom-group" id="zoom-group" role="group" aria-label="视口缩放">
+              <button class="zoom-btn" data-zoom="2" type="button">2×</button>
+              <button class="zoom-btn" data-zoom="4" type="button">4×</button>
+              <button class="zoom-btn is-active" data-zoom="6" type="button">6×</button>
+              <button class="zoom-btn" data-zoom="8" type="button">8×</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel panel-inspect">
+        <section class="inspect-block">
+          <div class="block-head">
+            <h3>16 色暗黑调色板</h3>
+            <span class="block-meta" id="palette-coverage">覆盖 --</span>
+          </div>
+          <div class="family-row" id="family-row"></div>
+          <div class="swatch-grid" id="swatch-grid"></div>
+          <p class="block-hint">点击色块 = 替换当前主色；点击色系 = 整图换肤。16 色覆盖率实时回写。</p>
+          <div class="block-actions">
+            <button class="btn btn-tiny" id="quantize-btn" type="button">16 色吸附量化</button>
+            <button class="btn btn-tiny" id="reset-btn" type="button">恢复原色</button>
+          </div>
+        </section>
+
+        <section class="inspect-block">
+          <div class="block-head">
+            <h3>质量合规性体检</h3>
+            <span class="score" id="score-value">--</span>
+          </div>
+          <div class="meter-list" id="meter-list"></div>
+          <ul class="issue-list" id="issue-list"></ul>
+        </section>
+
+        <section class="inspect-block">
+          <div class="block-head">
+            <h3>色彩分布</h3>
+            <span class="block-meta" id="color-count">--</span>
+          </div>
+          <div class="color-bars" id="color-bars"></div>
+        </section>
+
+        <section class="inspect-block">
+          <div class="block-head">
+            <h3>LLM Prompt 模板</h3>
+            <button class="btn btn-tiny" id="copy-prompt" type="button">复制</button>
+          </div>
+          <div class="prompt-tabs" id="prompt-tabs">
+            <button class="prompt-tab is-active" data-prompt="tower" type="button">防御塔</button>
+            <button class="prompt-tab" data-prompt="monster" type="button">怪物动作</button>
+            <button class="prompt-tab" data-prompt="core" type="button">材料核心</button>
+          </div>
+          <textarea id="prompt-output" readonly rows="6" spellcheck="false"></textarea>
+        </section>
+
+        <section class="inspect-block" id="custom-panel" hidden>
+          <div class="block-head">
+            <h3>自定义 SVG 校验</h3>
+            <button class="btn btn-tiny" id="custom-close" type="button">收起</button>
+          </div>
+          <textarea id="custom-input" rows="6" spellcheck="false" placeholder="粘贴 SVG 源码：根节点需声明 shape-rendering=&quot;crispEdges&quot;，仅允许整数坐标的 <rect>"></textarea>
+          <div class="block-actions">
+            <button class="btn btn-tiny" id="custom-validate" type="button">校验并载入</button>
+            <button class="btn btn-tiny" id="custom-sample" type="button">填入非法示例</button>
+          </div>
+          <ul class="issue-list" id="custom-issues"></ul>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="statusbar">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span id="status-text">工作台就绪</span>
+      <span class="status-right" id="status-right">12 塔 · 3 怪 · 32 帧 · 离线资产内联</span>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <noscript>
+    <div class="noscript">PixelForge AI 像素工坊需要启用 JavaScript 才能运行。</div>
+  </noscript>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

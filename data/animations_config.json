@@ -1,0 +1,80 @@
+{
+  "ashen_wolf": {
+    "walk": {
+      "frames_count": 4,
+      "frame_width": 32,
+      "frame_height": 32,
+      "spritesheet_1x": "assets/spritesheets/ashen_wolf_walk_1x.png",
+      "spritesheet_2x": "assets/spritesheets/ashen_wolf_walk_2x.png",
+      "frame_rate": 6
+    },
+    "attack": {
+      "frames_count": 3,
+      "frame_width": 32,
+      "frame_height": 32,
+      "spritesheet_1x": "assets/spritesheets/ashen_wolf_attack_1x.png",
+      "spritesheet_2x": "assets/spritesheets/ashen_wolf_attack_2x.png",
+      "frame_rate": 8
+    },
+    "death": {
+      "frames_count": 3,
+      "frame_width": 32,
+      "frame_height": 32,
+      "spritesheet_1x": "assets/spritesheets/ashen_wolf_death_1x.png",
+      "spritesheet_2x": "assets/spritesheets/ashen_wolf_death_2x.png",
+      "frame_rate": 8
+    }
+  },
+  "crawler": {
+    "walk": {
+      "frames_count": 4,
+      "frame_width": 32,
+      "frame_height": 32,
+      "spritesheet_1x": "assets/spritesheets/crawler_walk_1x.png",
+      "spritesheet_2x": "assets/spritesheets/crawler_walk_2x.png",
+      "frame_rate": 6
+    },
+    "attack": {
+      "frames_count": 3,
+      "frame_width": 32,
+      "frame_height": 32,
+      "spritesheet_1x": "assets/spritesheets/crawler_attack_1x.png",
+      "spritesheet_2x": "assets/spritesheets/crawler_attack_2x.png",
+      "frame_rate": 8
+    },
+    "death": {
+      "frames_count": 3,
+      "frame_width": 32,
+      "frame_height": 32,
+      "spritesheet_1x": "assets/spritesheets/crawler_death_1x.png",
+      "spritesheet_2x": "assets/spritesheets/crawler_death_2x.png",
+      "frame_rate": 8
+    }
+  },
+  "boss_wolf": {
+    "walk": {
+      "frames_count": 4,
+      "frame_width": 48,
+      "frame_height": 48,
+      "spritesheet_1x": "assets/spritesheets/boss_wolf_walk_1x.png",
+      "spritesheet_2x": "assets/spritesheets/boss_wolf_walk_2x.png",
+      "frame_rate": 6
+    },
+    "attack": {
+      "frames_count": 4,
+      "frame_width": 48,
+      "frame_height": 48,
+      "spritesheet_1x": "assets/spritesheets/boss_wolf_attack_1x.png",
+      "spritesheet_2x": "assets/spritesheets/boss_wolf_attack_2x.png",
+      "frame_rate": 8
+    },
+    "death": {
+      "frames_count": 4,
+      "frame_width": 48,
+      "frame_height": 48,
+      "spritesheet_1x": "assets/spritesheets/boss_wolf_death_1x.png",
+      "spritesheet_2x": "assets/spritesheets/boss_wolf_death_2x.png",
+      "frame_rate": 8
+    }
+  }
+}

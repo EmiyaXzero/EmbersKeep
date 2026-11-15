@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" shape-rendering="crispEdges">
+  <!-- 暗影基座 -->
+  <rect x="8" y="25" width="16" height="6" fill="#110A1C"/>
+  <rect x="10" y="22" width="12" height="3" fill="#26123D"/>
+  <rect x="12" y="19" width="8" height="3" fill="#3B185F"/>
+  <!-- 悬浮裂开的黑石柱身 -->
+  <rect x="8" y="8" width="4" height="10" fill="#1A0F2B"/>
+  <rect x="20" y="8" width="4" height="10" fill="#1A0F2B"/>
+  <rect x="9" y="6" width="3" height="5" fill="#3B185F"/>
+  <rect x="20" y="6" width="3" height="5" fill="#3B185F"/>
+  <!-- 中央虚空引力黑洞核心 -->
+  <rect x="13" y="9" width="6" height="6" fill="#1E0533"/>
+  <rect x="14" y="10" width="4" height="4" fill="#7E22CE"/>
+  <rect x="15" y="11" width="2" height="2" fill="#C084FC"/>
+  <!-- 环绕重力符文光环 -->
+  <rect x="6" y="11" width="2" height="2" fill="#A855F7"/>
+  <rect x="24" y="11" width="2" height="2" fill="#A855F7"/>
+  <rect x="15" y="4" width="2" height="2" fill="#C084FC"/>
+</svg>

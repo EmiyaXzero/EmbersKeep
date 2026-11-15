@@ -1,0 +1,58 @@
+{
+  "recipes": [
+    {
+      "recipe_id": "recipe_wind_repeater",
+      "result_card_id": "card_wind_repeater",
+      "result_name": "疾风连射弩",
+      "base_blueprint": "bp_crossbow_tower",
+      "monster_core": "core_wolf",
+      "rune": "rune_swift_string",
+      "modifiers": {
+        "attack_speed_multiplier": 2.2,
+        "burst_count": 2,
+        "base_damage_offset": -5
+      },
+      "description": "融合风狼核心与轻快弓弦，化作高速连射弩塔。"
+    },
+    {
+      "recipe_id": "recipe_thunder_ballista",
+      "result_card_id": "card_thunder_ballista",
+      "result_name": "雷霆脉冲弩",
+      "base_blueprint": "bp_crossbow_tower",
+      "monster_core": "core_thunder_beast",
+      "rune": "rune_spark_coil",
+      "modifiers": {
+        "chain_lightning_count": 4,
+        "chain_damage_decay": 0.15,
+        "damage_type": "lightning"
+      },
+      "description": "发射带电弩矢，在敌群间跳跃传导破坏电弧。"
+    },
+    {
+      "recipe_id": "recipe_thorns_barricade",
+      "result_card_id": "card_thorns_barricade",
+      "result_name": "荆棘岩壁",
+      "base_blueprint": "bp_stone_wall",
+      "monster_core": "core_stone_golem",
+      "rune": "rune_spiked_armor",
+      "modifiers": {
+        "damage_reflection_percent": 0.35,
+        "hp_multiplier": 1.5
+      },
+      "description": "受击时以尖锐岩刺反弹近战伤害。"
+    },
+    {
+      "recipe_id": "recipe_inferno_shrine",
+      "result_card_id": "card_inferno_shrine",
+      "result_name": "焚天余烬坛",
+      "base_blueprint": "bp_flame_altar",
+      "monster_core": "core_fire_drake",
+      "rune": "rune_ember_spread",
+      "modifiers": {
+        "ground_burn_duration": 4.0,
+        "burn_dps": 18
+      },
+      "description": "在地面留下不熄的暗红烈焰，灼烧途径的所有目标。"
+    }
+  ]
+}

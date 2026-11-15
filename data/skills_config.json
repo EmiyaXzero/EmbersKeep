@@ -1,0 +1,49 @@
+{
+  "roguelike_skills": [
+    {
+      "id": "skill_ember_echo",
+      "name": "余烬回响",
+      "synergy_tag": "burn",
+      "rarity": "rare",
+      "effect": "turret_kill_explode",
+      "params": {"radius": 45, "damage_percent": 0.5},
+      "description": "防御设施击杀敌人时产生余烬爆炸，对周围造成击杀伤害50%的范围伤害。"
+    },
+    {
+      "id": "skill_piercing_arrow",
+      "name": "穿云之箭",
+      "synergy_tag": "barrage",
+      "rarity": "common",
+      "effect": "projectile_pierce_add",
+      "params": {"pierce_count": 1, "crit_rate": 0.1},
+      "description": "所有弩塔投射物获得 +1 穿透目标数，暴击率提升 10%。"
+    },
+    {
+      "id": "skill_molten_heart",
+      "name": "熔岩之心",
+      "synergy_tag": "burn",
+      "rarity": "rare",
+      "effect": "fire_damage_boost",
+      "params": {"damage_multiplier": 1.4, "dot_duration_bonus": 1.5},
+      "description": "火焰伤害提升 40%，且灼烧持续时间延长 1.5 秒。"
+    },
+    {
+      "id": "skill_iron_will",
+      "name": "钢铁意志",
+      "synergy_tag": "counter",
+      "rarity": "common",
+      "effect": "base_hit_heal",
+      "params": {"heal_percent": 0.02, "max_trigger_per_sec": 3},
+      "description": "城墙或阵地受到伤害时，恢复 2% 最大生命值。"
+    },
+    {
+      "id": "skill_thunder_resonance",
+      "name": "雷霆共鸣",
+      "synergy_tag": "chain",
+      "rarity": "epic",
+      "effect": "chain_no_decay",
+      "params": {"decay_immunity": true, "stun_chance": 0.15},
+      "description": "雷电连锁伤害不再衰减，且每次跳跃有 15% 几率眩晕目标 1 秒。"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "pixelforge-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "PixelForge AI 像素工坊 - 纯前端矢量像素与逐帧动画工作台",
+  "scripts": {
+    "test": "node tests/run_all.js"
+  }
+}
